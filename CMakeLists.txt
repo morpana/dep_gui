@@ -6,8 +6,8 @@ cmake_minimum_required(VERSION 2.8.0)
 project(dep_gui)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O0 -g")
 
-find_package(catkin REQUIRED COMPONENTS qt_build roscpp)
-catkin_package(CATKIN_DEPENDS roscpp)
+find_package(catkin REQUIRED COMPONENTS qt_build roscpp roboy_dep)
+catkin_package(CATKIN_DEPENDS roscpp roboy_dep)
 
 ###########
 ### Qt #### 
@@ -33,6 +33,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 ###################
 
 add_executable(dep_gui ${QT_SOURCES} ${QT_FORMS_HPP} ${QT_MOC_HPP} )
+add_dependencies(dep_gui roboy_dep_generate_messsages_cpp)
 target_link_libraries(dep_gui ${QT_LIBRARIES} ${catkin_LIBRARIES})
 
 ####################

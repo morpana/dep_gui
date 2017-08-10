@@ -17,13 +17,27 @@ MainWindow::MainWindow(QWidget *parent) :
 	motorConfig = nh->advertise<roboy_communication_middleware::MotorConfig>("/roboy/middleware/MotorConfig", 1);
 	depParameters = nh->advertise<roboy_dep::depParameters>("/roboy_dep/depParameters", 1);
 
+	depMatrix = nh->subscribe("/roboy_dep/depMatrix", 1, &MainWindow::printMatrix, this); 
 	//sub = nh->subscribe("/roboy/middleware/MotorConfig", 1, &MainWindow::Print, this);
 	//sub = nh->subscribe("/roboy_dep/depParameters", 1, &MainWindow::Print, this);
 
 	ui->setupUi(this);
-	QObject::connect(ui->sendCommand, SIGNAL(released()), this, SLOT(sendCommand()));
+
+	QSignalMapper* signalMapper = new QSignalMapper(this);
+
+	QObject::connect(ui->force, SIGNAL(released()), signalMapper, SLOT(map()));
+	QObject::connect(ui->init, SIGNAL(released()), signalMapper, SLOT(map()));
+	QObject::connect(ui->update, SIGNAL(released()), signalMapper, SLOT(map()));
+
+	signalMapper -> setMapping(ui->force, "force");
+	signalMapper -> setMapping(ui->init, "init");
+	signalMapper -> setMapping(ui->update, "update");
+
+	QObject::connect(signalMapper, SIGNAL(mapped(QString)), this, SLOT(sendCommand(QString)));
+
 	QObject::connect(ui->updateController, SIGNAL(released()), this, SLOT(setMotorConfig()));
 	QObject::connect(ui->updateDepParams, SIGNAL(released()), this, SLOT(setDepConfig()));
+	//QObject::connect(ui->toggleLearning, SIGNAL(released()), this, SLOT(sendCommand(ui->toggleLearning)));
 
 	spinner = boost::shared_ptr<ros::AsyncSpinner>(new ros::AsyncSpinner(5));
 	spinner->start();
@@ -46,8 +60,21 @@ void MainWindow::Print(const roboy_dep::depParameters::ConstPtr &msg){
 }
 */
 
-void MainWindow::sendCommand(){
-	QString s = ui->textEdit->toPlainText();
+
+void MainWindow::printMatrix(const roboy_dep::depMatrix::ConstPtr &msg){
+	ROS_INFO("TEST");
+	for (int i = 0; i < msg->size; i++) {
+		//std::string s;
+		for (int j = 0; j < msg->depMatrix[i].size; j++) {
+			//s.append(boost::lexical_cast<std::string>(msg->depMatrix[i].cArray[j])+",");
+		}
+		//ROS_INFO("%s", s.c_str());
+	}
+}
+
+void MainWindow::sendCommand(QString s){
+	//QString s = ui->textEdit->toPlainText();
+	setDepConfig();
 	roboy_dep::command msg;
 	//cout << qPrintable(s);
 	msg.command = qPrintable(s);
@@ -98,6 +125,9 @@ void MainWindow::setDepConfig(){
 	msg.guideIdx = atoi(ui->guideIdx->text().toStdString().c_str());
 	msg.guideAmpl = stod(ui->guideAmpl->text().toStdString().c_str());
 	msg.guideFreq = stod(ui->guideFreq->text().toStdString().c_str());
+	msg.learning = atoi(ui->learning->text().toStdString().c_str());
+	msg.targetForce = atoi(ui->targetForce->text().toStdString().c_str());
+	msg.range = atoi(ui->range->text().toStdString().c_str());
 	depParameters.publish(msg);
 	//double urate = stod(ui->urate->text().toStdString().c_str());
 	//cout << urate << "\n";

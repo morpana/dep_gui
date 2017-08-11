@@ -36,14 +36,23 @@ private:
 	ros::Subscriber depMatrix;
 	boost::shared_ptr<ros::AsyncSpinner> spinner;
 
+	vector<vector<double>> C;
+
 	//ros::Subscriber sub;
 	//void Print(const roboy_communication_middleware::MotorConfig::ConstPtr &msg);
 	//void Print(const roboy_dep::depParameters::ConstPtr &msg);
-	void printMatrix(const roboy_dep::depMatrix::ConstPtr &msg);
+	//void printMatrix(const roboy_dep::depMatrix::ConstPtr &msg);
+	QCPColorMap *colorMap;
+	QCPColorScale *colorScale;
+	void msgDepMatrix(const roboy_dep::depMatrix::ConstPtr &msg);
+
+Q_SIGNALS:
+	void newDepMatrix();
 private Q_SLOTS:
     void sendCommand(QString);
     void setMotorConfig();
     void setDepConfig();
+    void plotDepMatrix();
 };
 
 #endif // MAINWINDOW_H

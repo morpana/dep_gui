@@ -17,11 +17,13 @@ MainWindow::MainWindow(QWidget *parent) :
 	motorConfig = nh->advertise<roboy_communication_middleware::MotorConfig>("/roboy/middleware/MotorConfig", 1);
 	depParameters = nh->advertise<roboy_dep::depParameters>("/roboy_dep/depParameters", 1);
 
-	depMatrix = nh->subscribe("/roboy_dep/depMatrix", 1, &MainWindow::printMatrix, this); 
+	depMatrix = nh->subscribe("/roboy_dep/depMatrix", 1, &MainWindow::msgDepMatrix, this); 
 	//sub = nh->subscribe("/roboy/middleware/MotorConfig", 1, &MainWindow::Print, this);
 	//sub = nh->subscribe("/roboy_dep/depParameters", 1, &MainWindow::Print, this);
 
 	ui->setupUi(this);
+
+	QObject::connect(this, SIGNAL(newDepMatrix()), this, SLOT(plotDepMatrix()));
 
 	QSignalMapper* signalMapper = new QSignalMapper(this);
 
@@ -38,6 +40,41 @@ MainWindow::MainWindow(QWidget *parent) :
 	QObject::connect(ui->updateController, SIGNAL(released()), this, SLOT(setMotorConfig()));
 	QObject::connect(ui->updateDepParams, SIGNAL(released()), this, SLOT(setDepConfig()));
 	//QObject::connect(ui->toggleLearning, SIGNAL(released()), this, SLOT(sendCommand(ui->toggleLearning)));
+
+	int motors = 14;
+	int sensors = 14;
+
+	// configure axis rect:
+	ui->customPlot->xAxis->setLabel("motor");
+	ui->customPlot->yAxis->setLabel("sensor");
+	ui->customPlot->xAxis->setRange(0,motors);
+	ui->customPlot->yAxis->setRange(0,sensors);
+
+	//Plotting DEP matrix
+	colorMap = new QCPColorMap(ui->customPlot->xAxis, ui->customPlot->yAxis);
+	colorMap->setGradient(QCPColorGradient::gpPolar);
+
+	colorMap->data()->setSize(motors, sensors); // we want the color map to have motors * sensors data points
+	colorMap->data()->setRange(QCPRange(0, motors), QCPRange(0, sensors)); // and span the coordinate range 0..(motors|sensors)
+	const QCPRange& dataRange = QCPRange(-0.5,0.5);
+	colorMap->setDataRange(dataRange);
+	colorMap->setInterpolate(false);
+
+	// add a color scale:
+	colorScale = new QCPColorScale(ui->customPlot);
+	ui->customPlot->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
+	colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
+	colorMap->setColorScale(colorScale); // associate the color map with the color scale
+	colorScale->axis()->setLabel("Connection strength");
+	colorScale->setDataRange(dataRange);
+	
+	// make sure the axis rect and color scale synchronize their bottom and top margins (so they line up):
+	QCPMarginGroup *marginGroup = new QCPMarginGroup(ui->customPlot);
+	ui->customPlot->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+	colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup);
+	 
+	// rescale the key (x) and value (y) axes so the whole color map is visible:
+	ui->customPlot->rescaleAxes();
 
 	spinner = boost::shared_ptr<ros::AsyncSpinner>(new ros::AsyncSpinner(5));
 	spinner->start();
@@ -60,7 +97,30 @@ void MainWindow::Print(const roboy_dep::depParameters::ConstPtr &msg){
 }
 */
 
+void MainWindow::msgDepMatrix(const roboy_dep::depMatrix::ConstPtr &msg){
+	// assign the data from the depMatrix
+	for (int i = 0; i < msg->size; i++) {
+		vector<double> temp;
+		for (int j = 0; j < msg->depMatrix[i].size; j++) {
+			temp.push_back(msg->depMatrix[i].cArray[j]);
+		}
+		C.push_back(temp);
+	}
+	// plot data
+	Q_EMIT newDepMatrix();
+}
 
+void MainWindow::plotDepMatrix(){
+	for (int i = 0; i < C.size(); i++) {
+		for (int j = 0; j < C[0].size(); j++) {
+			colorMap->data()->setCell(i,j,C[i][j]);
+		}
+	}
+	C.clear();
+	ui->customPlot->replot();
+}
+
+/*
 void MainWindow::printMatrix(const roboy_dep::depMatrix::ConstPtr &msg){
 	ROS_INFO("TEST");
 	for (int i = 0; i < msg->size; i++) {
@@ -71,6 +131,7 @@ void MainWindow::printMatrix(const roboy_dep::depMatrix::ConstPtr &msg){
 		//ROS_INFO("%s", s.c_str());
 	}
 }
+*/
 
 void MainWindow::sendCommand(QString s){
 	//QString s = ui->textEdit->toPlainText();

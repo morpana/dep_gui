@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -153,12 +153,6 @@
        </property>
       </widget>
      </widget>
-     <zorder>force</zorder>
-     <zorder>init</zorder>
-     <zorder>update</zorder>
-     <zorder>frame_15</zorder>
-     <zorder>label_13</zorder>
-     <zorder>frame_26</zorder>
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
@@ -1185,6 +1179,16 @@
        <string>Toggle learning</string>
       </property>
      </widget>
+     <widget class="QCustomPlot" name="customPlot" native="true">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>120</y>
+        <width>481</width>
+        <height>301</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>
@@ -1215,6 +1219,14 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>force</tabstop>
  </tabstops>

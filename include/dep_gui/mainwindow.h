@@ -13,6 +13,13 @@
 #include "roboy_dep/depMatrix.h"
 #include <roboy_communication_middleware/MotorConfig.h>
 
+#include <fstream>
+#include <sys/stat.h>
+#include <boost/filesystem.hpp>
+#include <stdlib.h>
+
+#include <regex>
+
 #define NUMBER_OF_MOTORS_PER_FPGA 14
 
 using namespace std;
@@ -32,7 +39,7 @@ public:
 private:
 	Ui::MainWindow *ui;
 	ros::NodeHandlePtr nh;
-	ros::Publisher depCommand, motorConfig, depParameters;
+	ros::Publisher depCommand, motorConfig, depParameters, depLoadMatrix;
 	ros::Subscriber depMatrix;
 	boost::shared_ptr<ros::AsyncSpinner> spinner;
 
@@ -42,10 +49,13 @@ private:
 	//void Print(const roboy_communication_middleware::MotorConfig::ConstPtr &msg);
 	//void Print(const roboy_dep::depParameters::ConstPtr &msg);
 	//void printMatrix(const roboy_dep::depMatrix::ConstPtr &msg);
+	//void msgLoadDepMatrix(const roboy_dep::depMatrix::ConstPtr &msg);
 	QCPColorMap *colorMap;
 	QCPColorScale *colorScale;
 	void msgDepMatrix(const roboy_dep::depMatrix::ConstPtr &msg);
-
+	void updateMatrixList();
+	bool learning;
+	string directory;
 Q_SIGNALS:
 	void newDepMatrix();
 private Q_SLOTS:
@@ -53,6 +63,9 @@ private Q_SLOTS:
     void setMotorConfig();
     void setDepConfig();
     void plotDepMatrix();
+    void toggleLearning();
+    void storeMatrix();
+    void restoreMatrix();
 };
 
 #endif // MAINWINDOW_H

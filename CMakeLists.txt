@@ -35,7 +35,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 ###################
 
 add_executable(dep_gui ${QT_SOURCES} ${QT_FORMS_HPP} ${QT_MOC_HPP} )
-add_dependencies(dep_gui ${catkin_EXPORTED_TARGETS} roboy_dep roboy_dep_generate_messsages_cpp)
+add_dependencies(dep_gui ${catkin_EXPORTED_TARGETS} roboy_dep_generate_messsages_cpp)
 target_link_libraries(dep_gui ${QT_LIBRARIES} ${catkin_LIBRARIES})
 
 ####################

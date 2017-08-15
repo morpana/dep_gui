@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>718</width>
-    <height>687</height>
+    <width>1208</width>
+    <height>690</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <rect>
       <x>0</x>
       <y>10</y>
-      <width>711</width>
+      <width>1181</width>
       <height>611</height>
      </rect>
     </property>
@@ -202,7 +202,7 @@
         <number>2</number>
        </property>
        <property name="value">
-        <number>2</number>
+        <number>0</number>
        </property>
       </widget>
      </widget>
@@ -1119,48 +1119,6 @@
        </property>
       </widget>
      </widget>
-     <widget class="QFrame" name="frame_25">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>460</y>
-        <width>311</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <widget class="QLabel" name="label_27">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>0</y>
-         <width>101</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>learning</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="learning">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>0</y>
-         <width>121</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>1</string>
-       </property>
-      </widget>
-     </widget>
     </widget>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -1170,9 +1128,9 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>30</y>
-        <width>151</width>
-        <height>27</height>
+        <y>20</y>
+        <width>141</width>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -1182,11 +1140,83 @@
      <widget class="QCustomPlot" name="customPlot" native="true">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>120</y>
-        <width>481</width>
-        <height>301</height>
+        <x>180</x>
+        <y>110</y>
+        <width>501</width>
+        <height>341</height>
        </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="saveFile">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>50</y>
+        <width>141</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="saveMatrix">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>80</y>
+        <width>141</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Save matrix</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="feedback">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>50</y>
+        <width>141</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Note: Input filename</string>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="matrixList">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>110</y>
+        <width>141</width>
+        <height>231</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="loadMatrix">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>300</y>
+        <width>121</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Load Matrix</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="learningLabel">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>20</y>
+        <width>141</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Learning: Enabled</string>
       </property>
      </widget>
     </widget>
@@ -1206,8 +1236,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>718</width>
-     <height>25</height>
+     <width>1208</width>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuInitialize">

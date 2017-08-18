@@ -44,8 +44,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	QObject::connect(ui->saveMatrix, SIGNAL(released()), this, SLOT(storeMatrix()));
 
-	int motors = 14;
-	int sensors = 14;
+	motors = 14;
+	sensors = 14;
 
 	// configure axis rect:
 	ui->customPlot->xAxis->setLabel("motor");
@@ -95,8 +95,64 @@ MainWindow::MainWindow(QWidget *parent) :
 		boost::filesystem::create_directory(dir);
 	}
 
-	updateMatrixList();
+	updateMatrixList(ui->matrixList);
+	updateMatrixList(ui->matrixList_2);
+
 	QObject::connect(ui->loadMatrix, SIGNAL(released()), this, SLOT(restoreMatrix()));
+
+	//function creation
+	QObject::connect(ui->step, SIGNAL(released()), this, SLOT(addStep()));
+	QObject::connect(ui->ramp, SIGNAL(released()), this, SLOT(addRamp()));
+	QObject::connect(ui->sine, SIGNAL(released()), this, SLOT(addSine()));
+
+	QObject::connect(ui->saveFunction, SIGNAL(released()), this, SLOT(saveFunction()));
+	QObject::connect(ui->removeFunction, SIGNAL(released()), this, SLOT(removeFunctionFromList()));
+	QObject::connect(ui->editFunction, SIGNAL(released()), this, SLOT(editFunctionFromList()));
+
+	//plotting created function
+	// create graph for each func
+	ui->plotFunction->addGraph();
+	
+	ui->plotFunction->xAxis->setLabel("time");
+	ui->plotFunction->yAxis->setLabel("y");
+	
+	ui->plotFunction->xAxis->setRange(0.0, 2.0);
+	ui->plotFunction->yAxis->setRange(-2.0, 2.0);
+
+	// matrix vector buttons
+	QObject::connect(ui->addMatrix, SIGNAL(released()), this, SLOT(addMatrix()));
+	QObject::connect(ui->removeMatrix, SIGNAL(released()), this, SLOT(removeMatrix()));
+
+	//Plotting DEP matrix again	
+
+	ui->customPlot_2->xAxis->setLabel("motor");
+	ui->customPlot_2->yAxis->setLabel("sensor");
+	ui->customPlot_2->xAxis->setRange(0,motors);
+	ui->customPlot_2->yAxis->setRange(0,sensors);
+
+	colorMap = new QCPColorMap(ui->customPlot_2->xAxis, ui->customPlot_2->yAxis);
+	colorMap->setGradient(QCPColorGradient::gpPolar);
+
+	colorMap->data()->setSize(motors, sensors); // we want the color map to have motors * sensors data points
+	colorMap->data()->setRange(QCPRange(0, motors), QCPRange(0, sensors)); // and span the coordinate range 0..(motors|sensors)
+	colorMap->setDataRange(dataRange);
+	colorMap->setInterpolate(false);
+
+	colorScale = new QCPColorScale(ui->customPlot_2);
+	ui->customPlot_2->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
+	colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
+	colorMap->setColorScale(colorScale); // associate the color map with the color scale
+	colorScale->axis()->setLabel("Connection strength");
+	colorScale->setDataRange(dataRange);
+
+	QCPMarginGroup *marginGroup1 = new QCPMarginGroup(ui->customPlot_2);
+	ui->customPlot_2->axisRect()->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup1);
+	colorScale->setMarginGroup(QCP::msBottom|QCP::msTop, marginGroup1);
+	
+	ui->customPlot_2->rescaleAxes();
+
+	QObject::connect(ui->plotMatrix, SIGNAL(released()), this, SLOT(plotMatrix()));	
+	QObject::connect(ui->plotMatrixSelected, SIGNAL(released()), this, SLOT(plotMatrixSelected()));	
 }
 
 MainWindow::~MainWindow()
@@ -113,8 +169,221 @@ void MainWindow::Print(const roboy_communication_middleware::MotorConfig::ConstP
 /*
 void MainWindow::Print(const roboy_dep::depParameters::ConstPtr &msg){
 	cout << msg->timedist << "\n";
-}
+}	
 */
+/*
+void MainWindow::plotDepMatrix_2(){
+
+	for (int i = 0; i < C.size(); i++) {
+		for (int j = 0; j < C[0].size(); j++) {
+			colorMap->data()->setCell(i,j,C[i][j]);
+		}
+	}
+	ui->customPlot->replot();
+}*/
+
+void MainWindow::plotMatrixSelected(){
+	if (ui->selectedMatrixList->selectedItems().size() != 0){
+		int k = atoi(ui->selectedMatrixList->currentItem()->text().toStdString().c_str());
+		for (int i = 0; i < lin.m[k].getM(); i++) {
+			for (int j = 0; j < lin.m[k].getN(); j++) {
+				colorMap->data()->setCell(i,j,lin.m[k].val(i,j));
+			}
+		}
+		ui->customPlot_2->replot();
+	} else {
+
+	}
+}
+
+void MainWindow::plotMatrix(){
+
+	roboy_dep::depMatrix msg;
+	if (ui->matrixList_2->selectedItems().size() != 0){
+		string filename = ui->matrixList_2->currentItem()->text().toStdString();
+		ifstream file(directory+filename);
+
+		if (file.is_open()){
+			string value;
+			roboy_dep::cArray msg_temp;
+			char delim = ',';
+			while(getline(file,value,delim)){
+				string row_end = "NEW_ROW";
+				if (value.c_str() != row_end){
+					msg_temp.cArray.push_back(atof(value.c_str()));
+				} else {
+					msg_temp.size = msg_temp.cArray.size();
+					msg.depMatrix.push_back(msg_temp);
+					msg_temp.cArray.clear();
+				}
+			}
+			msg.size = msg.depMatrix.size();
+		}
+		file.close();
+
+		// assign the data from the depMatrix
+		for (int i = 0; i < msg.size; i++) {
+			for (int j = 0; j < msg.depMatrix[i].size; j++) {
+				colorMap->data()->setCell(i,j,msg.depMatrix[i].cArray[j]);
+			}
+		}
+		ui->customPlot_2->replot();
+	} else {
+
+	}
+}
+
+void MainWindow::removeMatrix(){
+	if (ui->selectedMatrixList->selectedItems().size() != 0){
+		int i = atoi(ui->selectedMatrixList->currentItem()->text().toStdString().c_str());
+		lin.m.erase(lin.m.begin()+i);
+		ui->selectedMatrixList->clear();
+		for (int i; i < lin.m.size(); i++){
+			ui->selectedMatrixList->addItem(to_string(i).c_str());
+		}
+	}
+}
+
+void MainWindow::addMatrix(){
+
+	roboy_dep::depMatrix msg;
+	if (ui->matrixList_2->selectedItems().size() != 0){
+		string filename = ui->matrixList_2->currentItem()->text().toStdString();
+		ifstream file(directory+filename);
+
+		if (file.is_open()){
+			string value;
+			roboy_dep::cArray msg_temp;
+			char delim = ',';
+			while(getline(file,value,delim)){
+				string row_end = "NEW_ROW";
+				if (value.c_str() != row_end){
+					msg_temp.cArray.push_back(atof(value.c_str()));
+				} else {
+					msg_temp.size = msg_temp.cArray.size();
+					msg.depMatrix.push_back(msg_temp);
+					msg_temp.cArray.clear();
+				}
+			}
+			msg.size = msg.depMatrix.size();
+		}
+		file.close();
+
+		matrix::Matrix temp = matrix::Matrix(msg.size, msg.depMatrix[0].size);
+		// assign the data from the depMatrix
+		for (int i = 0; i < msg.size; i++) {
+			for (int j = 0; j < msg.depMatrix[i].size; j++) {
+				temp.val(i,j) = msg.depMatrix[i].cArray[j];
+			}
+		}
+		
+		lin.addMatrix(temp);
+		ui->selectedMatrixList->clear();
+		for (int i; i < lin.m.size(); i++){
+			ui->selectedMatrixList->addItem(to_string(i).c_str());
+		}
+	} else {
+
+	}
+}
+
+void MainWindow::editFunctionFromList(){
+	if (ui->functionList->selectedItems().size() != 0){
+		int i = atoi(ui->functionList->currentItem()->text().toStdString().c_str());
+		temp_function = lin.f[i];
+		plotFunc();
+	} else {
+
+	}
+}
+
+void MainWindow::removeFunctionFromList(){
+	if (ui->functionList->selectedItems().size() != 0){
+		int i = atoi(ui->functionList->currentItem()->text().toStdString().c_str());
+		lin.f.erase(lin.f.begin()+i);
+		updateFunctionList();
+	} else {
+
+	}
+}
+
+void MainWindow::updateFunctionList(){
+	// list widget showing available functions
+	ui->functionList->clear();
+	for (int i; i < lin.f.size(); i++){
+		ui->functionList->addItem(to_string(i).c_str());
+	}
+}
+
+void MainWindow::saveFunction(){
+	temp_function.setPeriod(stod(ui->period->text().toStdString().c_str()));
+	lin.addFunction(temp_function);
+	temp_function.clear();
+	plotFunc();
+	updateFunctionList();
+}
+
+void MainWindow::plotFunc(){
+	QVector<double> time(101), y(101);
+	for (int i = 0; i < 101; i++){
+		time.append(i*0.01);
+		y.append(temp_function.out(i*0.01));
+	}
+	ui->plotFunction->graph(0)->setData(time, y);
+	ui->plotFunction->replot();
+}
+
+void MainWindow::addStep(){
+	//need to fix period setting!!!
+	temp_function.setPeriod(stod(ui->period->text().toStdString().c_str()));
+	double amp = stod(ui->step_amp->text().toStdString().c_str());
+	double cutoff = stod(ui->step_cutoff->text().toStdString().c_str());
+	step_ step;
+	step.setParams(cutoff,amp);
+	temp_function.addStep(step);
+
+	double t_on = stod(ui->t_on->text().toStdString().c_str());
+	double t_off = stod(ui->t_off->text().toStdString().c_str());
+	window_ window;
+	window.setParams(t_on, t_off);
+	temp_function.addWindow(window);
+	
+	plotFunc();
+}
+
+void MainWindow::addRamp(){
+	double slope = stod(ui->ramp_slope->text().toStdString().c_str());
+	double shift = stod(ui->ramp_shift->text().toStdString().c_str());
+	ramp_ ramp;
+	ramp.setParams(slope,shift);
+	temp_function.addRamp(ramp);
+
+	double t_on = stod(ui->t_on->text().toStdString().c_str());
+	double t_off = stod(ui->t_off->text().toStdString().c_str());
+	window_ window;
+	window.setParams(t_on, t_off);
+	temp_function.addWindow(window);
+	
+	plotFunc();
+}
+
+void MainWindow::addSine(){
+	double amp = stod(ui->sine_amp->text().toStdString().c_str());
+	double freq = stod(ui->sine_freq->text().toStdString().c_str());
+	double phase = stod(ui->sine_phase->text().toStdString().c_str());
+
+	sine_ sine;
+	sine.setParams(amp,freq,phase);
+	temp_function.addSine(sine);
+
+	double t_on = stod(ui->t_on->text().toStdString().c_str());
+	double t_off = stod(ui->t_off->text().toStdString().c_str());
+	window_ window;
+	window.setParams(t_on, t_off);
+	temp_function.addWindow(window);
+	
+	plotFunc();
+}
 
 void MainWindow::toggleLearning(){
 	learning = (learning != true); //perform XOR
@@ -171,7 +440,7 @@ void MainWindow::storeMatrix(){
 		//ROS_INFO("%s", (directory+filename).c_str());
 		string extension = ".dep";
 		ofstream file;
-		file.open(directory+filename+extension);
+		file.open(directory+filename+extension, ios::trunc);
 		for (int i = 0; i < C.size(); i++) {
 			string s;
 			for (int j = 0; j < C[0].size(); j++) {
@@ -180,24 +449,26 @@ void MainWindow::storeMatrix(){
 			file << s << "NEW_ROW,";
 		}
 		file.close();
-		updateMatrixList();
+		updateMatrixList(ui->matrixList);
+		updateMatrixList(ui->matrixList_2);
 		ui->feedback->setText("Input filename");
-		updateMatrixList();
+		updateMatrixList(ui->matrixList);
+		updateMatrixList(ui->matrixList_2);
 	} else{
 		ui->feedback->setText("No C matrix to save!");
 	}
 }
 
-void MainWindow::updateMatrixList(){
+void MainWindow::updateMatrixList(QListWidget* list){
 	// list widget showing available matrices
-	ui->matrixList->clear();
+	list->clear();
 	QDir matrix_directory(QString::fromStdString(directory));
 	QStringList matrices = matrix_directory.entryList();
 	regex e ("(.*)(.dep)");
 	for (int i; i < matrices.size(); i++){
 		if (regex_match(matrices[i].toStdString().c_str(),e)){
 			//ROS_INFO("%s",matrices[i].toStdString().c_str());
-			ui->matrixList->addItem(matrices[i].toStdString().c_str());
+			list->addItem(matrices[i].toStdString().c_str());
 		}
 	}
 }
@@ -206,40 +477,44 @@ void MainWindow::restoreMatrix(){
 	roboy_dep::depMatrix msg;
 
 	//string filename = ui->loadFile->text().toStdString();
-	string filename = ui->matrixList->currentItem()->text().toStdString();
-	//ROS_INFO("%s", (directory+filename).c_str());
-	ifstream file(directory+filename);
+	if (ui->matrixList->selectedItems().size() != 0){
+		string filename = ui->matrixList->currentItem()->text().toStdString();
+		//ROS_INFO("%s", (directory+filename).c_str());
+		ifstream file(directory+filename);
 
-	if (file.is_open()){
-		string value;
-		roboy_dep::cArray msg_temp;
-		char delim = ',';
-		//double d;
-		while(getline(file,value,delim)){
-			string row_end = "NEW_ROW";
-			if (value.c_str() != row_end){
-				//d += 0.3;
-				//if (d>0.5){d -= 1;}
-				//msg_temp.cArray.push_back(d);
-				msg_temp.cArray.push_back(atof(value.c_str()));
-				//ROS_INFO("%s",value.c_str());
-			} else {
-				/*
-				for (int i = 0; i < msg_temp.size; i++){
-					ROS_INFO("%f", msg_temp[i]);
-				}*/
-				//ROS_INFO("\n");
-				msg_temp.size = msg_temp.cArray.size();
-				msg.depMatrix.push_back(msg_temp);
-				msg_temp.cArray.clear();
+		if (file.is_open()){
+			string value;
+			roboy_dep::cArray msg_temp;
+			char delim = ',';
+			//double d;
+			while(getline(file,value,delim)){
+				string row_end = "NEW_ROW";
+				if (value.c_str() != row_end){
+					//d += 0.3;
+					//if (d>0.5){d -= 1;}
+					//msg_temp.cArray.push_back(d);
+					msg_temp.cArray.push_back(atof(value.c_str()));
+					//ROS_INFO("%s",value.c_str());
+				} else {
+					/*
+					for (int i = 0; i < msg_temp.size; i++){
+						ROS_INFO("%f", msg_temp[i]);
+					}*/
+					//ROS_INFO("\n");
+					msg_temp.size = msg_temp.cArray.size();
+					msg.depMatrix.push_back(msg_temp);
+					msg_temp.cArray.clear();
+				}
+
 			}
-
+			msg.size = msg.depMatrix.size();
 		}
-		msg.size = msg.depMatrix.size();
+		//ROS_INFO("%i, %i", msg.size, msg.depMatrix[0].size);
+		file.close();
+		depLoadMatrix.publish(msg);
+	} else {
+
 	}
-	//ROS_INFO("%i, %i", msg.size, msg.depMatrix[0].size);
-	file.close();
-	depLoadMatrix.publish(msg);
 }
 
 void MainWindow::sendCommand(QString s){

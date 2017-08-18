@@ -20,6 +20,8 @@
 
 #include <regex>
 
+#include <dep_gui/linearCombination.h>
+
 #define NUMBER_OF_MOTORS_PER_FPGA 14
 
 using namespace std;
@@ -30,11 +32,11 @@ class MainWindow;
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+	explicit MainWindow(QWidget *parent = 0);
+	~MainWindow();
 
 private:
 	Ui::MainWindow *ui;
@@ -45,6 +47,7 @@ private:
 
 	vector<vector<double>> C;
 
+	int motors, sensors;
 	//ros::Subscriber sub;
 	//void Print(const roboy_communication_middleware::MotorConfig::ConstPtr &msg);
 	//void Print(const roboy_dep::depParameters::ConstPtr &msg);
@@ -53,19 +56,33 @@ private:
 	QCPColorMap *colorMap;
 	QCPColorScale *colorScale;
 	void msgDepMatrix(const roboy_dep::depMatrix::ConstPtr &msg);
-	void updateMatrixList();
+	void updateMatrixList(QListWidget* list);
 	bool learning;
 	string directory;
+	function_ temp_function;
+	linearCombination lin;
+	void plotFunc();
+	void updateFunctionList();
 Q_SIGNALS:
 	void newDepMatrix();
 private Q_SLOTS:
-    void sendCommand(QString);
-    void setMotorConfig();
-    void setDepConfig();
-    void plotDepMatrix();
-    void toggleLearning();
-    void storeMatrix();
-    void restoreMatrix();
+	void plotMatrix();
+	void plotMatrixSelected();
+	void removeMatrix();
+	void addMatrix();
+	void editFunctionFromList();	
+	void removeFunctionFromList();
+	void saveFunction();
+	void sendCommand(QString);
+	void setMotorConfig();
+	void setDepConfig();
+	void plotDepMatrix();
+	void toggleLearning();
+	void storeMatrix();
+	void restoreMatrix();
+	void addStep();
+	void addRamp();
+	void addSine();
 };
 
 #endif // MAINWINDOW_H

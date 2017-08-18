@@ -13,7 +13,7 @@ catkin_package(CATKIN_DEPENDS roscpp roboy_dep)
 ### Qt #### 
 ###########
 
-include_directories(qcustomplot)
+include_directories(qcustomplot include/dep_gui)
 
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 include(${QT_USE_FILE})
@@ -22,7 +22,7 @@ rosbuild_prepare_qt4(QtCore QtGui) # Add the appropriate components to the compo
 
 set(QT_FORMS ui/mainwindow.ui)
 set(QT_MOC include/dep_gui/mainwindow.h qcustomplot/qcustomplot.h)
-set(QT_SOURCES src/mainwindow.cpp src/main.cpp qcustomplot/qcustomplot.cpp)
+set(QT_SOURCES src/mainwindow.cpp src/main.cpp qcustomplot/qcustomplot.cpp src/matrix.cpp)
 
 QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
 QT4_WRAP_UI(QT_FORMS_HPP ${QT_FORMS})

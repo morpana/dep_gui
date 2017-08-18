@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1208</width>
-    <height>690</height>
+    <width>1239</width>
+    <height>688</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,12 +19,12 @@
      <rect>
       <x>0</x>
       <y>10</y>
-      <width>1181</width>
-      <height>611</height>
+      <width>1221</width>
+      <height>621</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -1124,100 +1124,1049 @@
      <attribute name="title">
       <string>Page</string>
      </attribute>
-     <widget class="QPushButton" name="toggleLearning">
+     <widget class="QFrame" name="frame_63">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>20</y>
-        <width>141</width>
-        <height>21</height>
+        <x>0</x>
+        <y>0</y>
+        <width>661</width>
+        <height>451</height>
        </rect>
       </property>
-      <property name="text">
-       <string>Toggle learning</string>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
       </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QFrame" name="frame_64">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>491</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QPushButton" name="toggleLearning">
+        <property name="geometry">
+         <rect>
+          <x>240</x>
+          <y>0</y>
+          <width>251</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Toggle learning</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="learningLabel">
+        <property name="geometry">
+         <rect>
+          <x>70</x>
+          <y>0</y>
+          <width>171</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Learning: Enabled</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame_68">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>491</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QPushButton" name="saveMatrix">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>471</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Save matrix</string>
+        </property>
+       </widget>
+       <widget class="QFrame" name="frame_69">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>471</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <widget class="QLabel" name="feedback">
+         <property name="geometry">
+          <rect>
+           <x>60</x>
+           <y>0</y>
+           <width>171</width>
+           <height>20</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Filename</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="saveFile">
+         <property name="geometry">
+          <rect>
+           <x>230</x>
+           <y>0</y>
+           <width>241</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame_70">
+       <property name="geometry">
+        <rect>
+         <x>510</x>
+         <y>10</y>
+         <width>141</width>
+         <height>431</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QListWidget" name="matrixList">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>121</width>
+          <height>381</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="loadMatrix">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>390</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Load Matrix</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QCustomPlot" name="customPlot" native="true">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>90</y>
+         <width>491</width>
+         <height>351</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
-     <widget class="QCustomPlot" name="customPlot" native="true">
+    </widget>
+    <widget class="QWidget" name="tab_9">
+     <attribute name="title">
+      <string>Page</string>
+     </attribute>
+     <widget class="QFrame" name="frame_29">
       <property name="geometry">
        <rect>
-        <x>180</x>
-        <y>110</y>
-        <width>501</width>
-        <height>341</height>
+        <x>10</x>
+        <y>10</y>
+        <width>571</width>
+        <height>571</height>
        </rect>
       </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QFrame" name="frame_60">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>411</width>
+         <height>261</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QFrame" name="frame_52">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>130</y>
+          <width>131</width>
+          <height>121</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <widget class="QLabel" name="label_52">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>59</width>
+           <height>14</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Sine</string>
+         </property>
+        </widget>
+        <widget class="QFrame" name="frame_57">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <widget class="QLineEdit" name="sine_amp">
+          <property name="geometry">
+           <rect>
+            <x>50</x>
+            <y>0</y>
+            <width>51</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>0.1</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_59">
+          <property name="geometry">
+           <rect>
+            <x>8</x>
+            <y>0</y>
+            <width>41</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Amp.</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QFrame" name="frame_58">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>50</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <widget class="QLineEdit" name="sine_freq">
+          <property name="geometry">
+           <rect>
+            <x>50</x>
+            <y>0</y>
+            <width>51</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>1.0</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_60">
+          <property name="geometry">
+           <rect>
+            <x>8</x>
+            <y>0</y>
+            <width>41</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Freq.</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QFrame" name="frame_59">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>70</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <widget class="QLineEdit" name="sine_phase">
+          <property name="geometry">
+           <rect>
+            <x>50</x>
+            <y>0</y>
+            <width>51</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>0.0</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_61">
+          <property name="geometry">
+           <rect>
+            <x>8</x>
+            <y>0</y>
+            <width>41</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Phase</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QPushButton" name="sine">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>90</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Add</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QFrame" name="frame_51">
+        <property name="geometry">
+         <rect>
+          <x>140</x>
+          <y>130</y>
+          <width>131</width>
+          <height>121</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <widget class="QLabel" name="label_51">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>59</width>
+           <height>14</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Ramp</string>
+         </property>
+        </widget>
+        <widget class="QFrame" name="frame_55">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <widget class="QLineEdit" name="ramp_slope">
+          <property name="geometry">
+           <rect>
+            <x>50</x>
+            <y>0</y>
+            <width>51</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>0.1</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_57">
+          <property name="geometry">
+           <rect>
+            <x>8</x>
+            <y>0</y>
+            <width>41</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Slope</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QFrame" name="frame_56">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>50</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <widget class="QLineEdit" name="ramp_shift">
+          <property name="geometry">
+           <rect>
+            <x>50</x>
+            <y>0</y>
+            <width>51</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>0.0</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_58">
+          <property name="geometry">
+           <rect>
+            <x>8</x>
+            <y>0</y>
+            <width>41</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Shift</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QPushButton" name="ramp">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>70</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Add</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QFrame" name="frame">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>130</y>
+          <width>131</width>
+          <height>121</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <widget class="QLabel" name="label_14">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>59</width>
+           <height>14</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Step</string>
+         </property>
+        </widget>
+        <widget class="QFrame" name="frame_53">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <widget class="QLineEdit" name="step_amp">
+          <property name="geometry">
+           <rect>
+            <x>50</x>
+            <y>0</y>
+            <width>51</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>0.1</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_53">
+          <property name="geometry">
+           <rect>
+            <x>8</x>
+            <y>0</y>
+            <width>41</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Amp.</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QFrame" name="frame_54">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>50</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <widget class="QLineEdit" name="step_cutoff">
+          <property name="geometry">
+           <rect>
+            <x>50</x>
+            <y>0</y>
+            <width>51</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>0.0</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_54">
+          <property name="geometry">
+           <rect>
+            <x>8</x>
+            <y>0</y>
+            <width>41</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Cutoff</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QPushButton" name="step">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>70</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Add</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QFrame" name="frame_65">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>40</y>
+          <width>391</width>
+          <height>81</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <widget class="QFrame" name="frame_66">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <widget class="QLineEdit" name="t_on">
+          <property name="geometry">
+           <rect>
+            <x>50</x>
+            <y>0</y>
+            <width>51</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>0.0</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_72">
+          <property name="geometry">
+           <rect>
+            <x>8</x>
+            <y>0</y>
+            <width>41</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>t_on</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QFrame" name="frame_67">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>50</y>
+           <width>111</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <widget class="QLineEdit" name="t_off">
+          <property name="geometry">
+           <rect>
+            <x>50</x>
+            <y>0</y>
+            <width>51</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>1.0</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_73">
+          <property name="geometry">
+           <rect>
+            <x>8</x>
+            <y>0</y>
+            <width>41</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>t_off</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QLabel" name="label_74">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>59</width>
+           <height>14</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Window</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QLabel" name="label_29">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>10</y>
+          <width>121</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Create Function</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="saveFunction">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>10</y>
+          <width>101</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Save Function</string>
+        </property>
+       </widget>
+       <widget class="QFrame" name="frame_61">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>10</y>
+          <width>111</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <widget class="QLineEdit" name="period">
+         <property name="geometry">
+          <rect>
+           <x>50</x>
+           <y>0</y>
+           <width>51</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>1.0</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_62">
+         <property name="geometry">
+          <rect>
+           <x>8</x>
+           <y>0</y>
+           <width>41</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Period</string>
+         </property>
+        </widget>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame_28">
+       <property name="geometry">
+        <rect>
+         <x>420</x>
+         <y>10</y>
+         <width>141</width>
+         <height>551</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLabel" name="label_28">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>121</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Created Functions</string>
+        </property>
+       </widget>
+       <widget class="QListWidget" name="functionList">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>40</y>
+          <width>121</width>
+          <height>441</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="removeFunction">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>480</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Remove Function</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="editFunction">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>510</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Edit Function</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QCustomPlot" name="plotFunction" native="true">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>280</y>
+         <width>401</width>
+         <height>281</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
-     <widget class="QLineEdit" name="saveFile">
+     <widget class="QFrame" name="frame_30">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>50</y>
-        <width>141</width>
-        <height>21</height>
+        <x>580</x>
+        <y>10</y>
+        <width>301</width>
+        <height>571</height>
        </rect>
       </property>
-     </widget>
-     <widget class="QPushButton" name="saveMatrix">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>80</y>
-        <width>141</width>
-        <height>22</height>
-       </rect>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
       </property>
-      <property name="text">
-       <string>Save matrix</string>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
       </property>
-     </widget>
-     <widget class="QLabel" name="feedback">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>50</y>
-        <width>141</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Note: Input filename</string>
-      </property>
-     </widget>
-     <widget class="QListWidget" name="matrixList">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>110</y>
-        <width>141</width>
-        <height>231</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="loadMatrix">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>300</y>
-        <width>121</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Load Matrix</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="learningLabel">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>20</y>
-        <width>141</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Learning: Enabled</string>
-      </property>
+      <widget class="QCustomPlot" name="customPlot_2" native="true">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>280</y>
+         <width>281</width>
+         <height>281</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QFrame" name="frame_27">
+       <property name="geometry">
+        <rect>
+         <x>150</x>
+         <y>10</y>
+         <width>141</width>
+         <height>261</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLabel" name="label_27">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>121</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Selected Matrices</string>
+        </property>
+       </widget>
+       <widget class="QListWidget" name="selectedMatrixList">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>121</width>
+          <height>161</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="removeMatrix">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>190</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Remove Matrix</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="plotMatrixSelected">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>220</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Plot Matrix</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QFrame" name="frame_25">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>141</width>
+         <height>261</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLabel" name="label_20">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>121</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Available Matrices</string>
+        </property>
+       </widget>
+       <widget class="QListWidget" name="matrixList_2">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>121</width>
+          <height>161</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="addMatrix">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>190</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Add Matrix</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="plotMatrix">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>220</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Plot Matrix</string>
+        </property>
+       </widget>
+      </widget>
      </widget>
     </widget>
    </widget>
@@ -1236,7 +2185,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1208</width>
+     <width>1239</width>
      <height>19</height>
     </rect>
    </property>

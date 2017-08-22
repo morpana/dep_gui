@@ -106,6 +106,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	QObject::connect(ui->sine, SIGNAL(released()), this, SLOT(addSine()));
 
 	QObject::connect(ui->saveFunction, SIGNAL(released()), this, SLOT(saveFunction()));
+	QObject::connect(ui->initFunction, SIGNAL(released()), this, SLOT(initFunction()));
 	QObject::connect(ui->removeFunction, SIGNAL(released()), this, SLOT(removeFunctionFromList()));
 	QObject::connect(ui->editFunction, SIGNAL(released()), this, SLOT(editFunctionFromList()));
 
@@ -116,8 +117,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->plotFunction->xAxis->setLabel("time");
 	ui->plotFunction->yAxis->setLabel("y");
 	
-	ui->plotFunction->xAxis->setRange(0.0, 2.0);
-	ui->plotFunction->yAxis->setRange(-2.0, 2.0);
+	ui->plotFunction->xAxis->setRange(0.0, 1.0);
+	ui->plotFunction->yAxis->setRange(-0.5, 1.5);
 
 	// matrix vector buttons
 	QObject::connect(ui->addMatrix, SIGNAL(released()), this, SLOT(addMatrix()));
@@ -130,18 +131,18 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->customPlot_2->xAxis->setRange(0,motors);
 	ui->customPlot_2->yAxis->setRange(0,sensors);
 
-	colorMap = new QCPColorMap(ui->customPlot_2->xAxis, ui->customPlot_2->yAxis);
-	colorMap->setGradient(QCPColorGradient::gpPolar);
+	colorMap1 = new QCPColorMap(ui->customPlot_2->xAxis, ui->customPlot_2->yAxis);
+	colorMap1->setGradient(QCPColorGradient::gpPolar);
 
-	colorMap->data()->setSize(motors, sensors); // we want the color map to have motors * sensors data points
-	colorMap->data()->setRange(QCPRange(0, motors), QCPRange(0, sensors)); // and span the coordinate range 0..(motors|sensors)
-	colorMap->setDataRange(dataRange);
-	colorMap->setInterpolate(false);
+	colorMap1->data()->setSize(motors, sensors); // we want the color map to have motors * sensors data points
+	colorMap1->data()->setRange(QCPRange(0, motors), QCPRange(0, sensors)); // and span the coordinate range 0..(motors|sensors)
+	colorMap1->setDataRange(dataRange);
+	colorMap1->setInterpolate(false);
 
 	colorScale = new QCPColorScale(ui->customPlot_2);
 	ui->customPlot_2->plotLayout()->addElement(0, 1, colorScale); // add it to the right of the main axis rect
 	colorScale->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
-	colorMap->setColorScale(colorScale); // associate the color map with the color scale
+	colorMap1->setColorScale(colorScale); // associate the color map with the color scale
 	colorScale->axis()->setLabel("Connection strength");
 	colorScale->setDataRange(dataRange);
 
@@ -152,7 +153,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->customPlot_2->rescaleAxes();
 
 	QObject::connect(ui->plotMatrix, SIGNAL(released()), this, SLOT(plotMatrix()));	
-	QObject::connect(ui->plotMatrixSelected, SIGNAL(released()), this, SLOT(plotMatrixSelected()));	
+	QObject::connect(ui->plotMatrixSelected, SIGNAL(released()), this, SLOT(plotMatrixSelected()));
+
+	QObject::connect(ui->pubLinComb, SIGNAL(released()), this, SLOT(togglePubLinComb()));
+
 }
 
 MainWindow::~MainWindow()
@@ -182,12 +186,52 @@ void MainWindow::plotDepMatrix_2(){
 	ui->customPlot->replot();
 }*/
 
+void MainWindow::publishLinearCombination(){
+	while (1){
+		if (publish_combination){
+			roboy_dep::depMatrix msg;
+			matrix::Matrix temp_matrix = lin.out(time_);
+			msg.size = temp_matrix.getM();
+			for (int i = 0; i < msg.size; i++) {
+				roboy_dep::cArray msg_temp;
+				msg_temp.size = temp_matrix.getN();
+				for (int j = 0; j < msg_temp.size; j++) {
+					msg_temp.cArray.push_back(temp_matrix.val(i,j));
+				}
+				msg.depMatrix.push_back(msg_temp);
+			}
+			depLoadMatrix.publish(msg);
+			time_ += 0.02;
+		}
+		usleep(20000);
+	}
+}
+
+void MainWindow::togglePubLinComb(){
+	//check correct number of matrices and functions specified
+	if ((ui->selectedMatrixList->count() != 0) and (ui->functionList->count() != 0) and (ui->selectedMatrixList->count() == ui->functionList->count())){	
+		ui->warning->setText("");
+		publish_combination = (publish_combination != true);
+		if (publish_combination){
+			ui->combinationLabel->setText("Combination: Enabled");
+			learning = false;
+			ui->learningLabel->setText("Learning: Disabled");
+		} else {
+			ui->combinationLabel->setText("Combination: Disabled");
+			learning = true;
+			ui->learningLabel->setText("Learning: Enabled");
+		}
+	} else {
+		ui->warning->setText("Must have non-zero equal number of functions and matrices!");
+	}
+}
+
 void MainWindow::plotMatrixSelected(){
 	if (ui->selectedMatrixList->selectedItems().size() != 0){
 		int k = atoi(ui->selectedMatrixList->currentItem()->text().toStdString().c_str());
 		for (int i = 0; i < lin.m[k].getM(); i++) {
 			for (int j = 0; j < lin.m[k].getN(); j++) {
-				colorMap->data()->setCell(i,j,lin.m[k].val(i,j));
+				colorMap1->data()->setCell(i,j,lin.m[k].val(i,j));
 			}
 		}
 		ui->customPlot_2->replot();
@@ -224,7 +268,7 @@ void MainWindow::plotMatrix(){
 		// assign the data from the depMatrix
 		for (int i = 0; i < msg.size; i++) {
 			for (int j = 0; j < msg.depMatrix[i].size; j++) {
-				colorMap->data()->setCell(i,j,msg.depMatrix[i].cArray[j]);
+				colorMap1->data()->setCell(i,j,msg.depMatrix[i].cArray[j]);
 			}
 		}
 		ui->customPlot_2->replot();
@@ -291,6 +335,8 @@ void MainWindow::editFunctionFromList(){
 	if (ui->functionList->selectedItems().size() != 0){
 		int i = atoi(ui->functionList->currentItem()->text().toStdString().c_str());
 		temp_function = lin.f[i];
+		lin.f.erase(lin.f.begin()+i);
+		updateFunctionList();
 		plotFunc();
 	} else {
 
@@ -315,8 +361,14 @@ void MainWindow::updateFunctionList(){
 	}
 }
 
-void MainWindow::saveFunction(){
+void MainWindow::initFunction(){
+	temp_function.clear();
 	temp_function.setPeriod(stod(ui->period->text().toStdString().c_str()));
+	ui->plotFunction->xAxis->setRange(0.0, temp_function.getPeriod());
+	plotFunc();
+}
+
+void MainWindow::saveFunction(){
 	lin.addFunction(temp_function);
 	temp_function.clear();
 	plotFunc();
@@ -324,8 +376,9 @@ void MainWindow::saveFunction(){
 }
 
 void MainWindow::plotFunc(){
-	QVector<double> time(101), y(101);
-	for (int i = 0; i < 101; i++){
+	int steps = (int) temp_function.getPeriod()/0.01+0.5;
+	QVector<double> time(steps+1), y(steps+1);
+	for (int i = 0; i < steps+1; i++){
 		time.append(i*0.01);
 		y.append(temp_function.out(i*0.01));
 	}
@@ -335,7 +388,6 @@ void MainWindow::plotFunc(){
 
 void MainWindow::addStep(){
 	//need to fix period setting!!!
-	temp_function.setPeriod(stod(ui->period->text().toStdString().c_str()));
 	double amp = stod(ui->step_amp->text().toStdString().c_str());
 	double cutoff = stod(ui->step_cutoff->text().toStdString().c_str());
 	step_ step;
@@ -386,14 +438,18 @@ void MainWindow::addSine(){
 }
 
 void MainWindow::toggleLearning(){
-	learning = (learning != true); //perform XOR
-	if (learning){
-		ui->learningLabel->setText("Learning: Enabled");
+	if (!publish_combination){
+		learning = (learning != true); //perform XOR
+		if (learning){
+			ui->learningLabel->setText("Learning: Enabled");
+		} else {
+			ui->learningLabel->setText("Learning: Disabled");
+		}
+		//ROS_INFO("%i", learning);
+		setDepConfig();
 	} else {
-		ui->learningLabel->setText("Learning: Disabled");
+		ui->learningLabel->setText("Turn off publishing!");
 	}
-	//ROS_INFO("%i", learning);
-	setDepConfig();
 }
 
 /*

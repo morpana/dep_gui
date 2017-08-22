@@ -59,6 +59,7 @@ class sine_: public timeFunction {
 class function_ {
 	public:
 		void setPeriod(double period){ T = period; }
+		double getPeriod(){ return T;}
 		void addStep(step_ s){
 			steps.push_back(s);
 			//ROS_INFO("%p",&steps[steps.size()-1]);

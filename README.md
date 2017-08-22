@@ -2,7 +2,7 @@ to do:
 - add linear combination functionality
 done - matrix::Matrix function(vector<matrix::Matrix>, vector<vector<periodicFunction*>>)
 done - periodicFunction class and derivatives
-	 - need to create method for specifying matrices and functions
+	 done - need to create method for specifying matrices and functions
 	 	done - select matrix and add to matrix vector
 	 		done - display matrix vector
 	 		done - select matrix from matrix vector and display
@@ -14,4 +14,11 @@ done - periodicFunction class and derivatives
 	 	done - add new function to functions vector
 	 		done - disply functions vector
 	 		done - select function from functions vector for editing
-	 		- fix period setting for function
+	 	done - fix period setting for function
+	 		done - initialize function -> fix period for function
+	 done - publish linearCombination matrix 
+	 	done - add toggle button enabling/disabling LinComb output
+	 	done - create thread for running LinComb 
+	 	done - calculation and publishing depMatrix
+	 	done - plot published matrix (automatic in tab 4)
+	 	done - fix crash when correct number of matrices and functions missing

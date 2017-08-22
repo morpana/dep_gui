@@ -22,6 +22,9 @@
 
 #include <dep_gui/linearCombination.h>
 
+//#include <pthread.h>
+#include <thread>
+
 #define NUMBER_OF_MOTORS_PER_FPGA 14
 
 using namespace std;
@@ -37,6 +40,9 @@ class MainWindow : public QMainWindow
 public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
+	std::thread spawn_thread(){
+		return std::thread( [this] {this->publishLinearCombination();});
+	}
 
 private:
 	Ui::MainWindow *ui;
@@ -53,7 +59,7 @@ private:
 	//void Print(const roboy_dep::depParameters::ConstPtr &msg);
 	//void printMatrix(const roboy_dep::depMatrix::ConstPtr &msg);
 	//void msgLoadDepMatrix(const roboy_dep::depMatrix::ConstPtr &msg);
-	QCPColorMap *colorMap;
+	QCPColorMap *colorMap, *colorMap1;
 	QCPColorScale *colorScale;
 	void msgDepMatrix(const roboy_dep::depMatrix::ConstPtr &msg);
 	void updateMatrixList(QListWidget* list);
@@ -63,15 +69,22 @@ private:
 	linearCombination lin;
 	void plotFunc();
 	void updateFunctionList();
+	
+	double time_ = 0;
+	bool publish_combination = false;
+	void publishLinearCombination(); 
+
 Q_SIGNALS:
 	void newDepMatrix();
 private Q_SLOTS:
+	void togglePubLinComb();
 	void plotMatrix();
 	void plotMatrixSelected();
 	void removeMatrix();
 	void addMatrix();
 	void editFunctionFromList();	
 	void removeFunctionFromList();
+	void initFunction();
 	void saveFunction();
 	void sendCommand(QString);
 	void setMotorConfig();

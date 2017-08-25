@@ -99,3 +99,6 @@ private Q_SLOTS:
 };
 
 #endif // MAINWINDOW_H
+
+
+//sudo kill -9 $(ps -al|grep '\(roboy_dep\|dep_interface\|dep_gui\)'|awk '{print $4;}'|tr '\n' ' ')

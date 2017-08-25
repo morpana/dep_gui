@@ -1,24 +1,15 @@
 to do:
-- add linear combination functionality
-done - matrix::Matrix function(vector<matrix::Matrix>, vector<vector<periodicFunction*>>)
-done - periodicFunction class and derivatives
-	 done - need to create method for specifying matrices and functions
-	 	done - select matrix and add to matrix vector
-	 		done - display matrix vector
-	 		done - select matrix from matrix vector and display
-	 	done - create function i.e. summation of base functions
-	 		done - implementation: vector of base functions of which the outputs are summed
-	 		done - choose base function and select parameters
-	 		done - add base function to vector
-	 		done - update plot of function (summation of vector elements outputs for one period)
-	 	done - add new function to functions vector
-	 		done - disply functions vector
-	 		done - select function from functions vector for editing
-	 	done - fix period setting for function
-	 		done - initialize function -> fix period for function
-	 done - publish linearCombination matrix 
-	 	done - add toggle button enabling/disabling LinComb output
-	 	done - create thread for running LinComb 
-	 	done - calculation and publishing depMatrix
-	 	done - plot published matrix (automatic in tab 4)
-	 	done - fix crash when correct number of matrices and functions missing
+- display position and force
+	- in same units as initialization position and dep parameter force
+
+- write data to bags: http://wiki.ros.org/rosbag/Code API
+- plot muscle activity
+- analyse data in python
+	- read data from bags
+	- visualize data
+	- frequency domain representation
+
+
+issues:
+- why do the muscle slack
+- if toggle learning is disabled, it wont transition into the pattern of a loaded matrix

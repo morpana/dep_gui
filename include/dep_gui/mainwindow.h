@@ -11,7 +11,9 @@
 #include "roboy_dep/depParameters.h"
 #include "roboy_dep/cArray.h"
 #include "roboy_dep/depMatrix.h"
+#include "roboy_dep/transition.h"
 #include <roboy_communication_middleware/MotorConfig.h>
+#include <roboy_communication_middleware/MotorStatus.h>
 
 #include <fstream>
 #include <sys/stat.h>
@@ -24,6 +26,7 @@
 
 //#include <pthread.h>
 #include <thread>
+#include <chrono>
 
 #define NUMBER_OF_MOTORS_PER_FPGA 14
 
@@ -47,9 +50,18 @@ public:
 private:
 	Ui::MainWindow *ui;
 	ros::NodeHandlePtr nh;
-	ros::Publisher depCommand, motorConfig, depParameters, depLoadMatrix;
-	ros::Subscriber depMatrix;
+	ros::Publisher depCommand, motorConfig, depParameters, depLoadMatrix, transition_pub;
+	ros::Subscriber depMatrix, motorStatus;
 	boost::shared_ptr<ros::AsyncSpinner> spinner;
+
+
+	void MotorStatus(const roboy_communication_middleware::MotorStatus::ConstPtr &msg);
+	QVector<double> motorPos[NUMBER_OF_MOTORS_PER_FPGA];
+	QVector<double> motorForce[NUMBER_OF_MOTORS_PER_FPGA];
+	QVector<double> plot_time;
+	long int counter;
+	QColor color_pallette[14] = {Qt::blue, Qt::red, Qt::green, Qt::cyan, Qt::magenta, Qt::darkGray, Qt::darkRed, Qt::darkGreen,
+							   Qt::darkBlue, Qt::darkCyan, Qt::darkMagenta, Qt::darkYellow, Qt::black, Qt::gray};
 
 	vector<vector<double>> C;
 
@@ -69,14 +81,34 @@ private:
 	linearCombination lin;
 	void plotFunc();
 	void updateFunctionList();
-	
-	double time_ = 0;
+	int transition_type;
+	bool transition;
+	double duration;
+	matrix::Matrix current_matrix, restore_matrix;
+	double time_;
+	std::chrono::high_resolution_clock::time_point t_start;
+	bool start;
 	bool publish_combination = false;
 	void publishLinearCombination(); 
-
+	void updateComponentList();
+	//trigger vars
+	double trigger_level;
+	int trigger_motor;
+	bool trigger_edge;
+	bool trigger_on;
+	string prev_filename;
 Q_SIGNALS:
 	void newDepMatrix();
+	void newMotorData();
 private Q_SLOTS:
+	void toggleTriggerEdge();
+	void toggleTrigger();
+	void stepTransition();
+	void rampTransition();
+	void sineTransition();
+	void removeComponent();
+	void plotMotorData();
+	void removeMatrix_2();
 	void togglePubLinComb();
 	void plotMatrix();
 	void plotMatrixSelected();
@@ -102,3 +134,4 @@ private Q_SLOTS:
 
 
 //sudo kill -9 $(ps -al|grep '\(roboy_dep\|dep_interface\|dep_gui\)'|awk '{print $4;}'|tr '\n' ' ')
+//sudo killall -9 rosmaster

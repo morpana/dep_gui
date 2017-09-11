@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	depLoadMatrix = nh->advertise<roboy_dep::depMatrix>("/roboy_dep/depLoadMatrix", 1);
 
 	depMatrix = nh->subscribe("/roboy_dep/depMatrix", 1, &MainWindow::msgDepMatrix, this); 
+	motorStatus = nh->subscribe("/roboy/middleware/MotorStatus", 1, &MainWindow::MotorStatus, this);
 	//sub = nh->subscribe("/roboy_dep/depLoadMatrix", 1, &MainWindow::msgLoadDepMatrix, this);
 	//sub = nh->subscribe("/roboy_dep/depParameters", 1, &MainWindow::Print, this);
 
@@ -45,8 +46,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	QObject::connect(ui->saveMatrix, SIGNAL(released()), this, SLOT(storeMatrix()));
 
 	motors = 14;
-	sensors = 14;
-
+	sensors = 14*2;
+	current_matrix = matrix::Matrix(motors,sensors);
 	// configure axis rect:
 	ui->customPlot->xAxis->setLabel("motor");
 	ui->customPlot->yAxis->setLabel("sensor");
@@ -99,6 +100,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	updateMatrixList(ui->matrixList_2);
 
 	QObject::connect(ui->loadMatrix, SIGNAL(released()), this, SLOT(restoreMatrix()));
+	QObject::connect(ui->removeMatrix_2, SIGNAL(released()), this, SLOT(removeMatrix_2()));
 
 	//function creation
 	QObject::connect(ui->step, SIGNAL(released()), this, SLOT(addStep()));
@@ -157,6 +159,41 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	QObject::connect(ui->pubLinComb, SIGNAL(released()), this, SLOT(togglePubLinComb()));
 
+	QObject::connect(this, SIGNAL(newMotorData()), this, SLOT(plotMotorData()));
+	for (uint motor = 0; motor < NUMBER_OF_MOTORS_PER_FPGA; motor++) {
+		ui->position_plot->addGraph();
+		ui->position_plot->graph(motor)->setPen(QPen(color_pallette[motor]));
+		ui->displacement_plot->addGraph();
+		ui->displacement_plot->graph(motor)->setPen(QPen(color_pallette[motor]));
+	}
+	ui->position_plot->xAxis->setLabel("x");
+	ui->position_plot->yAxis->setLabel("ticks");
+	ui->position_plot->replot();
+
+	ui->displacement_plot->xAxis->setLabel("x");
+	ui->displacement_plot->yAxis->setLabel("ticks");
+	ui->displacement_plot->replot();
+
+	QObject::connect(ui->removeComponent, SIGNAL(released()), this, SLOT(removeComponent()));	
+
+
+	//transition stuff
+	QObject::connect(ui->stepTransition, SIGNAL(released()), this, SLOT(stepTransition()));	
+	QObject::connect(ui->rampTransition, SIGNAL(released()), this, SLOT(rampTransition()));	
+	QObject::connect(ui->sineTransition, SIGNAL(released()), this, SLOT(sineTransition()));	
+
+	transition = 0;
+	transition_type = 0;
+
+	QObject::connect(ui->triggerEdge, SIGNAL(released()), this, SLOT(toggleTriggerEdge()));
+	QObject::connect(ui->setTrigger, SIGNAL(released()), this, SLOT(toggleTrigger()));
+	trigger_level = 0.0;
+	trigger_edge = 1;
+	trigger_motor = 0;
+	trigger_on = 0;
+
+	transition_pub = nh->advertise<roboy_dep::transition>("/roboy_dep/transition", 1);
+	prev_filename = "None";
 }
 
 MainWindow::~MainWindow()
@@ -186,11 +223,132 @@ void MainWindow::plotDepMatrix_2(){
 	ui->customPlot->replot();
 }*/
 
+void MainWindow::toggleTriggerEdge(){
+	trigger_edge = (trigger_edge != true);
+	if (trigger_edge == 1){
+		ui->edgeText->setText("Rising edge");
+	} else {
+		ui->edgeText->setText("Falling edge");
+	}
+}
+
+void MainWindow::toggleTrigger(){
+	trigger_on = (trigger_on != true);
+	if (trigger_on == 0){
+		ui->triggerText->setText("Off");
+	} else {
+		ui->triggerText->setText("On");
+	}	
+	trigger_level = atof(ui->triggerLevel->text().toStdString().c_str());
+	trigger_motor = atoi(ui->triggerMotor->cleanText().toStdString().c_str());
+
+}
+
+void MainWindow::stepTransition(){
+	transition_type = 0;
+}
+void MainWindow::rampTransition(){
+	transition_type = 1;
+	duration = atof(ui->ramp_transition_duration->text().toStdString().c_str());
+}
+void MainWindow::sineTransition(){
+	transition_type = 2;
+	duration = atof(ui->ramp_transition_duration->text().toStdString().c_str());
+}
+
+
+void MainWindow::plotMotorData(){
+	for (uint motor = 0; motor < NUMBER_OF_MOTORS_PER_FPGA; motor++) {
+		ui->position_plot->graph(motor)->setData(plot_time, motorPos[motor]);
+		ui->displacement_plot->graph(motor)->setData(plot_time, motorForce[motor]);
+		if (motor == 0) {
+			ui->position_plot->graph(motor)->rescaleAxes();
+			ui->displacement_plot->graph(motor)->rescaleAxes();
+		} else {
+			ui->position_plot->graph(motor)->rescaleAxes(true);
+			ui->displacement_plot->graph(motor)->rescaleAxes(true);
+		}
+	}
+	ui->position_plot->replot();
+	ui->displacement_plot->replot();
+}
+
+void MainWindow::MotorStatus(const roboy_communication_middleware::MotorStatus::ConstPtr &msg){
+	for (int i = 0; i < NUMBER_OF_MOTORS_PER_FPGA; i++){
+		//ROS_INFO("%i", msg->position[i]);
+		motorPos[i].push_back(msg->position[i]);
+		motorForce[i].push_back(msg->displacement[i]);
+		if(motorPos[i].size() > 300){
+			motorPos[i].pop_front();
+			motorForce[i].pop_front();
+		}
+	}
+	plot_time.push_back(counter++*0.002);
+	if(plot_time.size()>300){
+		plot_time.pop_front();
+	}
+	Q_EMIT newMotorData();
+}
+
+void MainWindow::removeMatrix_2(){
+	if (	ui->matrixList->selectedItems().size() != 0){
+		string s = 	ui->matrixList->currentItem()->text().toStdString();
+		delete 	ui->matrixList->takeItem(ui->matrixList->row(ui->matrixList->currentItem()));
+		string temp = directory+s;
+		ROS_INFO("%s", temp.c_str());
+		boost::filesystem::remove(temp.c_str());
+	} else {
+
+	}
+}
+
 void MainWindow::publishLinearCombination(){
+	bool on = false;
+	double prev_level = 0.0;
+	double curr_level = 0.0;
 	while (1){
+		t_start = std::chrono::high_resolution_clock::now();
+
+		matrix::Matrix temp_matrix;
 		if (publish_combination){
+			temp_matrix = lin.out(time_);
+		} else if (transition){
+			if (trigger_on){
+				prev_level = (motorPos[trigger_motor][294]+motorPos[trigger_motor][295]+motorPos[trigger_motor][296])/3;
+				curr_level = (motorPos[trigger_motor][297]+motorPos[trigger_motor][298]+motorPos[trigger_motor][299])/3;
+				ROS_INFO("%f, %f", prev_level, curr_level);
+				if (trigger_edge){
+					if (prev_level < trigger_level and curr_level > trigger_level){
+						on = 1;
+					}
+				} else {
+					if (prev_level > trigger_level and curr_level < trigger_level){
+						on = 1;
+					}
+				}
+			} else {
+				on = 1;
+			}
+			if (on){
+				if (start){
+					time_ = 0.0;
+					start = false;
+				}
+				if (transition_type == 0){
+					temp_matrix = restore_matrix;
+				} else if (transition_type == 1){
+					double w0 = time_/duration;
+					double w1 = 1-w0;
+					temp_matrix = restore_matrix*w0+current_matrix*w1;
+				} else if (transition_type == 2){
+					double w0 = sin(PI/duration*time_-PI/4)/2+0.5;
+					double w1 = 1-w0;
+					temp_matrix = restore_matrix*w0+current_matrix*w1;
+				}
+			}
+		}
+		if (publish_combination or on){
 			roboy_dep::depMatrix msg;
-			matrix::Matrix temp_matrix = lin.out(time_);
 			msg.size = temp_matrix.getM();
 			for (int i = 0; i < msg.size; i++) {
 				roboy_dep::cArray msg_temp;
@@ -201,9 +359,19 @@ void MainWindow::publishLinearCombination(){
 				msg.depMatrix.push_back(msg_temp);
 			}
 			depLoadMatrix.publish(msg);
-			time_ += 0.02;
+			if (time_/duration > 1.0){
+				transition = 0;
+				on = 0;
+			}
 		}
-		usleep(20000);
+		std::chrono::high_resolution_clock::time_point t_end = std::chrono::high_resolution_clock::now();
+		auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count();
+		while(diff < 20){
+			usleep(100);
+			t_end = std::chrono::high_resolution_clock::now();
+			diff = std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count();
+		}
+		time_ += 0.02;
 	}
 }
 
@@ -229,11 +397,16 @@ void MainWindow::togglePubLinComb(){
 void MainWindow::plotMatrixSelected(){
 	if (ui->selectedMatrixList->selectedItems().size() != 0){
 		int k = atoi(ui->selectedMatrixList->currentItem()->text().toStdString().c_str());
-		for (int i = 0; i < lin.m[k].getM(); i++) {
-			for (int j = 0; j < lin.m[k].getN(); j++) {
+		int motors = lin.m[k].getM();
+		int sensors = lin.m[k].getN();
+		for (int i = 0; i < motors; i++) {
+			for (int j = 0; j < sensors; j++) {
 				colorMap1->data()->setCell(i,j,lin.m[k].val(i,j));
 			}
-		}
+		} 
+		ui->customPlot_2->xAxis->setRange(0,motors);
+		ui->customPlot_2->yAxis->setRange(0,sensors);
+		colorMap1->data()->setRange(QCPRange(0, motors), QCPRange(0, sensors)); // and span the coordinate range 0..(motors|sensors)
 		ui->customPlot_2->replot();
 	} else {
 
@@ -266,11 +439,16 @@ void MainWindow::plotMatrix(){
 		file.close();
 
 		// assign the data from the depMatrix
-		for (int i = 0; i < msg.size; i++) {
-			for (int j = 0; j < msg.depMatrix[i].size; j++) {
+		int motors = msg.size;
+		int sensors = msg.depMatrix[0].size;
+		for (int i = 0; i < motors; i++) {
+			for (int j = 0; j < sensors; j++) {
 				colorMap1->data()->setCell(i,j,msg.depMatrix[i].cArray[j]);
 			}
 		}
+		ui->customPlot_2->xAxis->setRange(0,motors);
+		ui->customPlot_2->yAxis->setRange(0,sensors);
+		colorMap1->data()->setRange(QCPRange(0, motors), QCPRange(0, sensors)); // and span the coordinate range 0..(motors|sensors)
 		ui->customPlot_2->replot();
 	} else {
 
@@ -386,6 +564,30 @@ void MainWindow::plotFunc(){
 	ui->plotFunction->replot();
 }
 
+void MainWindow::removeComponent(){
+	string s(ui->componentList->currentItem()->text().toStdString());	
+	regex ex1 ("^.*?([0-9]+$)");
+	regex ex2 ("^([0-9]+?.*$)");
+	smatch sm;
+	regex_match(s,sm,ex2);
+	for (int i = 0; i < sm.size(); i++){
+		ROS_INFO("%s", sm[i]);
+	}
+}
+
+void MainWindow::updateComponentList(){
+	ui->componentList->clear();
+	int steps = 0;
+	int ramps = 0;
+	int sines = 0;
+	string num;
+	for (int i = 0; i < temp_function.f.size(); i++){
+		string type = temp_function.f[i]->type();
+		if (type == "step"){ steps++; num = to_string(steps);} else if (type == "ramp"){ ramps++; num = to_string(ramps);} else if (type == "sine") { sines++; num = to_string(sines);}
+		ui->componentList->addItem((to_string(i)+" - "+type+"_"+num).c_str());
+	}
+}
+
 void MainWindow::addStep(){
 	//need to fix period setting!!!
 	double amp = stod(ui->step_amp->text().toStdString().c_str());
@@ -400,6 +602,7 @@ void MainWindow::addStep(){
 	window.setParams(t_on, t_off);
 	temp_function.addWindow(window);
 	
+	updateComponentList();
 	plotFunc();
 }
 
@@ -416,6 +619,7 @@ void MainWindow::addRamp(){
 	window.setParams(t_on, t_off);
 	temp_function.addWindow(window);
 	
+	updateComponentList();
 	plotFunc();
 }
 
@@ -434,6 +638,7 @@ void MainWindow::addSine(){
 	window.setParams(t_on, t_off);
 	temp_function.addWindow(window);
 	
+	updateComponentList();
 	plotFunc();
 }
 
@@ -476,6 +681,11 @@ void MainWindow::msgDepMatrix(const roboy_dep::depMatrix::ConstPtr &msg){
 		C.push_back(temp);
 		//ROS_INFO("%s", s.c_str());
 	}
+	for (int i = 0; i < C.size(); i++) {
+		for (int j = 0; j < C[0].size(); j++) {
+			current_matrix.val(i,j)= C[i][j];
+		}
+	}
 	// plot data
 	Q_EMIT newDepMatrix();
 }
@@ -495,6 +705,7 @@ void MainWindow::storeMatrix(){
 		string filename = ui->saveFile->text().toStdString();
 		//ROS_INFO("%s", (directory+filename).c_str());
 		string extension = ".dep";
+		ROS_INFO("Storing matrix: %s", (filename+extension).c_str());
 		ofstream file;
 		file.open(directory+filename+extension, ios::trunc);
 		for (int i = 0; i < C.size(); i++) {
@@ -530,47 +741,57 @@ void MainWindow::updateMatrixList(QListWidget* list){
 }
 
 void MainWindow::restoreMatrix(){
-	roboy_dep::depMatrix msg;
+	string filename;
+	if (!publish_combination){
+		roboy_dep::depMatrix msg;
+		//string filename = ui->loadFile->text().toStdString();
+		if (ui->matrixList->selectedItems().size() != 0){
+			filename = ui->matrixList->currentItem()->text().toStdString();
+			//ROS_INFO("%s", (directory+filename).c_str());
+			ifstream file(directory+filename);
 
-	//string filename = ui->loadFile->text().toStdString();
-	if (ui->matrixList->selectedItems().size() != 0){
-		string filename = ui->matrixList->currentItem()->text().toStdString();
-		//ROS_INFO("%s", (directory+filename).c_str());
-		ifstream file(directory+filename);
-
-		if (file.is_open()){
-			string value;
-			roboy_dep::cArray msg_temp;
-			char delim = ',';
-			//double d;
-			while(getline(file,value,delim)){
-				string row_end = "NEW_ROW";
-				if (value.c_str() != row_end){
-					//d += 0.3;
-					//if (d>0.5){d -= 1;}
-					//msg_temp.cArray.push_back(d);
-					msg_temp.cArray.push_back(atof(value.c_str()));
-					//ROS_INFO("%s",value.c_str());
-				} else {
-					/*
-					for (int i = 0; i < msg_temp.size; i++){
-						ROS_INFO("%f", msg_temp[i]);
-					}*/
-					//ROS_INFO("\n");
-					msg_temp.size = msg_temp.cArray.size();
-					msg.depMatrix.push_back(msg_temp);
-					msg_temp.cArray.clear();
+			if (file.is_open()){
+				string value;
+				roboy_dep::cArray msg_temp;
+				char delim = ',';
+				//double d;
+				while(getline(file,value,delim)){
+					string row_end = "NEW_ROW";
+					if (value.c_str() != row_end){
+						msg_temp.cArray.push_back(atof(value.c_str()));
+					} else {
+						msg_temp.size = msg_temp.cArray.size();
+						msg.depMatrix.push_back(msg_temp);
+						msg_temp.cArray.clear();
+					}
 				}
-
+				msg.size = msg.depMatrix.size();
 			}
-			msg.size = msg.depMatrix.size();
+			file.close();
 		}
-		//ROS_INFO("%i, %i", msg.size, msg.depMatrix[0].size);
-		file.close();
-		depLoadMatrix.publish(msg);
+		restore_matrix = matrix::Matrix(msg.size, msg.depMatrix[0].size);
+		for (int i = 0; i < msg.size; i++) {
+			for (int j = 0; j < msg.depMatrix[i].size; j++) {
+				restore_matrix.val(i,j) = msg.depMatrix[i].cArray[j];
+			}
+		}
+		transition = true;
+		start = true;
 	} else {
-
+		ui->learningLabel->setText("Turn off publishing!");
 	}
+	roboy_dep::transition msg;
+	msg.matrix_filename = filename;
+	msg.prev_filename = prev_filename;
+	msg.transition_type = transition_type;
+	msg.trigger_on = trigger_on;
+	msg.trigger_motor = trigger_motor;
+	msg.trigger_level = trigger_level;
+	msg.trigger_edge = trigger_edge;
+	msg.duration = duration;
+	transition_pub.publish(msg);
+
+	prev_filename = filename;
 }
 
 void MainWindow::sendCommand(QString s){
@@ -621,6 +842,8 @@ void MainWindow::setDepConfig(){
 	msg.pretension = stod(ui->pretension->text().toStdString().c_str());
 	msg.maxForce   = stod(ui->maxForce->text().toStdString().c_str());
 	msg.springMult1 = stod(ui->springMult1->text().toStdString().c_str());
+	msg.springMult2 = stod(ui->springMult2->text().toStdString().c_str());
+	msg.diff = stod(ui->diff->text().toStdString().c_str());
 	msg.delay = atoi(ui->delay->text().toStdString().c_str());
 	msg.guideType = atoi(ui->guideType->text().toStdString().c_str());
 	msg.guideIdx = atoi(ui->guideIdx->text().toStdString().c_str());

@@ -14,12 +14,14 @@ using namespace std;
 class timeFunction {
 	public:
 		virtual double out(double time) = 0;
+		virtual string type() = 0;
 };
 
 class step_: public timeFunction {
 	public:
 		double out(double time){ if (time > t) { return 1.0*A; } else { return 0.0; } }
 		void setParams(double cutoff, double amplitude){ t = cutoff; A = amplitude;}
+		string type(){return "step";}
 	private:
 		double t, A;
 };
@@ -31,6 +33,7 @@ class window_: public timeFunction {
 			t_on = t_start; t_off = t_end; 
 			ON.setParams(t_on, 1.0); OFF.setParams(t_off, -1.0);
 		}
+		string type(){return "window";}
 	private:
 		double t_on, t_off;
 		step_ ON, OFF;
@@ -42,6 +45,7 @@ class ramp_: public timeFunction {
 		void setParams(double slope, double phase){ 
 			m = slope; phi = phase; 
 		}
+		string type(){return "ramp";}
 	private:
 		double m, phi;
 };
@@ -52,6 +56,7 @@ class sine_: public timeFunction {
 		void setParams(double amplitude, double frequency, double phase){ 
 			A = amplitude; f = frequency; phi = phase; 
 		}
+		string type(){return "sine";}
 	private:
 		double A, f, phi;
 };
@@ -68,12 +73,15 @@ class function_ {
 		}
 		void addRamp(ramp_ r){
 			ramps.push_back(r);
+			genF();
 		}
 		void addSine(sine_ s){
 			sines.push_back(s);
+			genF();
 		}
 		void addWindow(window_ win){
 			w.push_back(win);
+			genF();
 		}
 		void clear(){
 			steps.clear();
@@ -82,8 +90,7 @@ class function_ {
 			f.clear();
 			w.clear();
 		}
-		double out(double time){
-			double weight = 0;//, fnc, win;
+		void genF(){
 			f.clear();
 			for (int i = 0; i < steps.size(); i++){
 				f.push_back(&steps[i]);
@@ -94,6 +101,10 @@ class function_ {
 			for (int i = 0; i < sines.size(); i++){
 				f.push_back(&sines[i]);
 			}
+		}
+		double out(double time){
+			double weight = 0;//, fnc, win;
+			genF();
 			for (int i = 0; i < f.size(); i++){
 				//cout << "i: " << i << "\n";
 				//cout << "f[i]: " << f[i] << "\n";
@@ -105,12 +116,12 @@ class function_ {
 			}
 			return weight;
 		}
+		vector<timeFunction*> f;
 	private:
 		double T;
 		vector<step_> steps;
 		vector<ramp_> ramps;
 		vector<sine_> sines;
-		vector<timeFunction*> f;
 		vector<window_> w;
 };
 

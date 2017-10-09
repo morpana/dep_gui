@@ -1,5 +1,7 @@
 #include "dep_gui/mainwindow.h"
-
+#include <boost/algorithm/string/classification.hpp> // Include boost::for is_any_of
+#include <boost/algorithm/string/split.hpp> // Include for boost::split
+#include <algorithm>
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -182,18 +184,20 @@ MainWindow::MainWindow(QWidget *parent) :
 	QObject::connect(ui->rampTransition, SIGNAL(released()), this, SLOT(rampTransition()));	
 	QObject::connect(ui->sineTransition, SIGNAL(released()), this, SLOT(sineTransition()));	
 
-	transition = 0;
+	transition =  {false};
 	transition_type = 0;
 
 	QObject::connect(ui->triggerEdge, SIGNAL(released()), this, SLOT(toggleTriggerEdge()));
 	QObject::connect(ui->setTrigger, SIGNAL(released()), this, SLOT(toggleTrigger()));
 	trigger_level = 0.0;
 	trigger_edge = 1;
-	trigger_motor = 0;
+	//trigger_motor = {0};
 	trigger_on = 0;
 
 	transition_pub = nh->advertise<roboy_dep::transition>("/roboy_dep/transition", 1);
 	prev_filename = "None";
+
+	time_ = 0.0;
 }
 
 MainWindow::~MainWindow()
@@ -238,9 +242,18 @@ void MainWindow::toggleTrigger(){
 		ui->triggerText->setText("Off");
 	} else {
 		ui->triggerText->setText("On");
-	}	
+	}
+
+	// obtain trigger_motor vector from delimited list committed by user in GUI
+	trigger_motor.clear();	
 	trigger_level = atof(ui->triggerLevel->text().toStdString().c_str());
-	trigger_motor = atoi(ui->triggerMotor->cleanText().toStdString().c_str());
+	string s = ui->triggerMotor->text().toStdString();
+	std::vector<std::string> words;
+	boost::split(words, s, boost::is_any_of(", ;"), boost::token_compress_on);
+	for (int i = 0; i < words.size(); i++){
+		trigger_motor.push_back(atoi(words[i].c_str()));
+		//ROS_INFO("%i", trigger_motor[i]);
+	}
 
 }
 
@@ -253,7 +266,7 @@ void MainWindow::rampTransition(){
 }
 void MainWindow::sineTransition(){
 	transition_type = 2;
-	duration = atof(ui->ramp_transition_duration->text().toStdString().c_str());
+	duration = atof(ui->sine_transition_duration->text().toStdString().c_str());
 }
 
 
@@ -302,52 +315,20 @@ void MainWindow::removeMatrix_2(){
 	}
 }
 
+bool isTrue (int i){
+	return i == true;
+}
+
 void MainWindow::publishLinearCombination(){
-	bool on = false;
-	double prev_level = 0.0;
-	double curr_level = 0.0;
+	vector<bool> on;
+	vector<double> prev_level;
+	vector<double> curr_level;
 	while (1){
 		t_start = std::chrono::high_resolution_clock::now();
 
 		matrix::Matrix temp_matrix;
 		if (publish_combination){
 			temp_matrix = lin.out(time_);
-		} else if (transition){
-			if (trigger_on){
-				prev_level = (motorPos[trigger_motor][294]+motorPos[trigger_motor][295]+motorPos[trigger_motor][296])/3;
-				curr_level = (motorPos[trigger_motor][297]+motorPos[trigger_motor][298]+motorPos[trigger_motor][299])/3;
-				ROS_INFO("%f, %f", prev_level, curr_level);
-				if (trigger_edge){
-					if (prev_level < trigger_level and curr_level > trigger_level){
-						on = 1;
-					}
-				} else {
-					if (prev_level > trigger_level and curr_level < trigger_level){
-						on = 1;
-					}
-				}
-			} else {
-				on = 1;
-			}
-			if (on){
-				if (start){
-					time_ = 0.0;
-					start = false;
-				}
-				if (transition_type == 0){
-					temp_matrix = restore_matrix;
-				} else if (transition_type == 1){
-					double w0 = time_/duration;
-					double w1 = 1-w0;
-					temp_matrix = restore_matrix*w0+current_matrix*w1;
-				} else if (transition_type == 2){
-					double w0 = sin(PI/duration*time_-PI/4)/2+0.5;
-					double w1 = 1-w0;
-					temp_matrix = restore_matrix*w0+current_matrix*w1;
-				}
-			}
-		}
-		if (publish_combination or on){
 			roboy_dep::depMatrix msg;
 			msg.size = temp_matrix.getM();
 			for (int i = 0; i < msg.size; i++) {
@@ -359,11 +340,107 @@ void MainWindow::publishLinearCombination(){
 				msg.depMatrix.push_back(msg_temp);
 			}
 			depLoadMatrix.publish(msg);
-			if (time_/duration > 1.0){
-				transition = 0;
-				on = 0;
+		} else if (any_of(transition.begin(),transition.end(),isTrue)){
+			ROS_INFO("test");
+			// initialization for on, prev_level, curr_level
+			while (on.size() != trigger_motor.size()){
+				// this is here to reinitialize if muscles are taken out from list
+				if (on.size() > trigger_motor.size()){
+					on.clear();
+					prev_level.clear();
+					curr_level.clear();
+				}
+				on.push_back(false);
+				prev_level.push_back(0.0);
+				curr_level.push_back(0.0);
 			}
+			// if trigger enabled, calculate matrix accordingly
+			if (trigger_on){
+				for(int i=0; i < trigger_motor.size(); i++){
+					prev_level[i] = (motorPos[trigger_motor[i]][294]+motorPos[trigger_motor[i]][295]+motorPos[trigger_motor[i]][296])/3;
+					curr_level[i] = (motorPos[trigger_motor[i]][297]+motorPos[trigger_motor[i]][298]+motorPos[trigger_motor[i]][299])/3;
+					//ROS_INFO("%f, %f", prev_level[i], curr_level[i]);
+					if (trigger_edge){
+						if (prev_level[i] < trigger_level and curr_level[i] > trigger_level){
+							on[i] = 1;
+						}
+					} else {
+						if (prev_level[i] > trigger_level and curr_level[i] < trigger_level){
+							on[i] = 1;
+						}
+					}
+					// if the given muscle crosses the threshold, initialize/continue transition process and calculate the desired matrix
+					if (on[i]){
+						// if not yet initialized, initialize timer
+						if (start[i]){
+							time_vec[i] = 0.0;
+							start[i] = false;
+						}
+						if (transition_type == 0){
+							//calculate new matrix
+							temp_matrix = current_matrix;
+							for(int j=0; j<temp_matrix.getN(); j++){
+								temp_matrix.val(trigger_motor[i],j) = restore_matrix.val(trigger_motor[i],j);
+							}
+							// need to update current matrix in case another motor is updated before temp_matrix is sent i.e. during the same cycle
+							current_matrix = temp_matrix;
+							ROS_INFO("Motor: %i", trigger_motor[i]);
+							// transition is complete, end transition
+							transition[i] = false;
+							on[i] = 0;
+						} else if (transition_type == 1){
+							//calculate new matrix
+							double w0 = time_vec[i]/duration;
+							double w1 = 1.0-w0;
+							temp_matrix = restore_matrix*w0+current_matrix*w1;
+							
+							//if transition is complete, end transition for muscle
+							if (time_vec[i]/duration > 1.0){
+								transition[i] = false;
+								on[i] = 0;
+							}
+						} else if (transition_type == 2){
+							//calculate new matrix
+							double w0 = sin(PI/duration*time_vec[i]-PI/2)/2+0.5;
+							double w1 = 1-w0;	
+							temp_matrix = restore_matrix*w0+current_matrix*w1;
+							
+							//if transition is complete, end transition for muscle
+							if (time_vec[i]/duration > 1.0){
+								transition[i] = false;
+								on[i] = 0;
+							}
+						}
+					}
+				}
+			} else {
+				// if the trigger is not enabled, but a transition is called, update full matrix immediately
+				temp_matrix = restore_matrix;
+				fill(transition.begin(),transition.end(),false);
+				fill(start.begin(),start.end(),false);
+			}
+
+			// publish new matrix (in either case)
+			roboy_dep::depMatrix msg;
+			msg.size = temp_matrix.getM();
+			for (int i = 0; i < msg.size; i++) {
+				roboy_dep::cArray msg_temp;
+				msg_temp.size = temp_matrix.getN();
+				for (int j = 0; j < msg_temp.size; j++) {
+					msg_temp.cArray.push_back(temp_matrix.val(i,j));
+				}
+				msg.depMatrix.push_back(msg_temp);
+			}
+			depLoadMatrix.publish(msg);
+			ROS_INFO(" ");
 		}
+		// increment timer (for time dependent transitions i.e. ramp, sine)
+		time_ += 0.02;
+		for(int i=0;i<time_vec.size();i++){
+			time_vec[i] += 0.02;
+		}
+
+		// only perform updates at 20 ms intervals, so wait until 20 ms is done
 		std::chrono::high_resolution_clock::time_point t_end = std::chrono::high_resolution_clock::now();
 		auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count();
 		while(diff < 20){
@@ -371,7 +448,6 @@ void MainWindow::publishLinearCombination(){
 			t_end = std::chrono::high_resolution_clock::now();
 			diff = std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count();
 		}
-		time_ += 0.02;
 	}
 }
 
@@ -741,15 +817,18 @@ void MainWindow::updateMatrixList(QListWidget* list){
 }
 
 void MainWindow::restoreMatrix(){
-	string filename;
+	// if linear combination is not publishing
 	if (!publish_combination){
-		roboy_dep::depMatrix msg;
 		//string filename = ui->loadFile->text().toStdString();
+		
+		// if a file is selected
 		if (ui->matrixList->selectedItems().size() != 0){
+			string filename;
 			filename = ui->matrixList->currentItem()->text().toStdString();
 			//ROS_INFO("%s", (directory+filename).c_str());
 			ifstream file(directory+filename);
 
+			roboy_dep::depMatrix msg;
 			if (file.is_open()){
 				string value;
 				roboy_dep::cArray msg_temp;
@@ -768,30 +847,40 @@ void MainWindow::restoreMatrix(){
 				msg.size = msg.depMatrix.size();
 			}
 			file.close();
-		}
-		restore_matrix = matrix::Matrix(msg.size, msg.depMatrix[0].size);
-		for (int i = 0; i < msg.size; i++) {
-			for (int j = 0; j < msg.depMatrix[i].size; j++) {
-				restore_matrix.val(i,j) = msg.depMatrix[i].cArray[j];
+		
+			restore_matrix = matrix::Matrix(msg.size, msg.depMatrix[0].size);
+			for (int i = 0; i < msg.size; i++) {
+				for (int j = 0; j < msg.depMatrix[i].size; j++) {
+					restore_matrix.val(i,j) = msg.depMatrix[i].cArray[j];
+				}
 			}
+			//initialize transition and start
+			transition.clear();
+			start.clear();
+			time_vec.clear();
+			for (int i = 0; i < trigger_motor.size(); i++) {
+				transition.push_back(true);
+				start.push_back(true);
+				time_vec.push_back(0.0);
+			}
+
+			//publish message simply recording transition details
+			roboy_dep::transition msg1;
+			msg1.matrix_filename = filename;
+			msg1.prev_filename = prev_filename;
+			msg1.transition_type = transition_type;
+			msg1.trigger_on = trigger_on;
+			msg1.trigger_motor = trigger_motor;
+			msg1.trigger_level = trigger_level;
+			msg1.trigger_edge = trigger_edge;
+			msg1.duration = duration;
+			transition_pub.publish(msg1);
+
+			prev_filename = filename;
 		}
-		transition = true;
-		start = true;
 	} else {
 		ui->learningLabel->setText("Turn off publishing!");
 	}
-	roboy_dep::transition msg;
-	msg.matrix_filename = filename;
-	msg.prev_filename = prev_filename;
-	msg.transition_type = transition_type;
-	msg.trigger_on = trigger_on;
-	msg.trigger_motor = trigger_motor;
-	msg.trigger_level = trigger_level;
-	msg.trigger_edge = trigger_edge;
-	msg.duration = duration;
-	transition_pub.publish(msg);
-
-	prev_filename = filename;
 }
 
 void MainWindow::sendCommand(QString s){

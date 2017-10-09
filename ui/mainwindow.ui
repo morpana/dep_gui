@@ -1726,16 +1726,6 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <widget class="QSpinBox" name="triggerMotor">
-        <property name="geometry">
-         <rect>
-          <x>130</x>
-          <y>0</y>
-          <width>71</width>
-          <height>23</height>
-         </rect>
-        </property>
-       </widget>
        <widget class="QPushButton" name="setTrigger">
         <property name="geometry">
          <rect>
@@ -1825,6 +1815,19 @@
         </property>
         <property name="text">
          <string>Off</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="triggerMotor">
+        <property name="geometry">
+         <rect>
+          <x>130</x>
+          <y>0</y>
+          <width>71</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>3</string>
         </property>
        </widget>
       </widget>

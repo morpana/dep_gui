@@ -82,18 +82,19 @@ private:
 	void plotFunc();
 	void updateFunctionList();
 	int transition_type;
-	bool transition;
+	vector<bool> transition;
+	vector<bool> start;
 	double duration;
 	matrix::Matrix current_matrix, restore_matrix;
 	double time_;
+	vector<double> time_vec;
 	std::chrono::high_resolution_clock::time_point t_start;
-	bool start;
 	bool publish_combination = false;
 	void publishLinearCombination(); 
 	void updateComponentList();
 	//trigger vars
 	double trigger_level;
-	int trigger_motor;
+	vector<int> trigger_motor;
 	bool trigger_edge;
 	bool trigger_on;
 	string prev_filename;

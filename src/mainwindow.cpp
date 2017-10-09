@@ -243,18 +243,6 @@ void MainWindow::toggleTrigger(){
 	} else {
 		ui->triggerText->setText("On");
 	}
-
-	// obtain trigger_motor vector from delimited list committed by user in GUI
-	trigger_motor.clear();	
-	trigger_level = atof(ui->triggerLevel->text().toStdString().c_str());
-	string s = ui->triggerMotor->text().toStdString();
-	std::vector<std::string> words;
-	boost::split(words, s, boost::is_any_of(", ;"), boost::token_compress_on);
-	for (int i = 0; i < words.size(); i++){
-		trigger_motor.push_back(atoi(words[i].c_str()));
-		//ROS_INFO("%i", trigger_motor[i]);
-	}
-
 }
 
 void MainWindow::stepTransition(){
@@ -319,6 +307,22 @@ bool isTrue (int i){
 	return i == true;
 }
 
+void MainWindow::publishTempMatrix(matrix::Matrix temp_matrix){
+	// publish new matrix
+	roboy_dep::depMatrix msg;
+	msg.size = temp_matrix.getM();
+	for (int i = 0; i < msg.size; i++) {
+		roboy_dep::cArray msg_temp;
+		msg_temp.size = temp_matrix.getN();
+		for (int j = 0; j < msg_temp.size; j++) {
+			msg_temp.cArray.push_back(temp_matrix.val(i,j));
+		}
+		msg.depMatrix.push_back(msg_temp);
+	}
+	depLoadMatrix.publish(msg);
+}
+
+
 void MainWindow::publishLinearCombination(){
 	vector<bool> on;
 	vector<double> prev_level;
@@ -326,22 +330,12 @@ void MainWindow::publishLinearCombination(){
 	while (1){
 		t_start = std::chrono::high_resolution_clock::now();
 
-		matrix::Matrix temp_matrix;
 		if (publish_combination){
+			matrix::Matrix temp_matrix;
 			temp_matrix = lin.out(time_);
-			roboy_dep::depMatrix msg;
-			msg.size = temp_matrix.getM();
-			for (int i = 0; i < msg.size; i++) {
-				roboy_dep::cArray msg_temp;
-				msg_temp.size = temp_matrix.getN();
-				for (int j = 0; j < msg_temp.size; j++) {
-					msg_temp.cArray.push_back(temp_matrix.val(i,j));
-				}
-				msg.depMatrix.push_back(msg_temp);
-			}
-			depLoadMatrix.publish(msg);
+			publishTempMatrix(temp_matrix);
 		} else if (any_of(transition.begin(),transition.end(),isTrue)){
-			ROS_INFO("test");
+			matrix::Matrix temp_matrix;
 			// initialization for on, prev_level, curr_level
 			while (on.size() != trigger_motor.size()){
 				// this is here to reinitialize if muscles are taken out from list
@@ -356,84 +350,86 @@ void MainWindow::publishLinearCombination(){
 			}
 			// if trigger enabled, calculate matrix accordingly
 			if (trigger_on){
+				// flag to publish if any update to matrix after going through all muscles
+				bool publish = false;
 				for(int i=0; i < trigger_motor.size(); i++){
-					prev_level[i] = (motorPos[trigger_motor[i]][294]+motorPos[trigger_motor[i]][295]+motorPos[trigger_motor[i]][296])/3;
-					curr_level[i] = (motorPos[trigger_motor[i]][297]+motorPos[trigger_motor[i]][298]+motorPos[trigger_motor[i]][299])/3;
-					//ROS_INFO("%f, %f", prev_level[i], curr_level[i]);
-					if (trigger_edge){
-						if (prev_level[i] < trigger_level and curr_level[i] > trigger_level){
-							on[i] = 1;
-						}
-					} else {
-						if (prev_level[i] > trigger_level and curr_level[i] < trigger_level){
-							on[i] = 1;
-						}
-					}
-					// if the given muscle crosses the threshold, initialize/continue transition process and calculate the desired matrix
-					if (on[i]){
-						// if not yet initialized, initialize timer
-						if (start[i]){
-							time_vec[i] = 0.0;
-							start[i] = false;
-						}
-						if (transition_type == 0){
-							//calculate new matrix
-							temp_matrix = current_matrix;
-							for(int j=0; j<temp_matrix.getN(); j++){
-								temp_matrix.val(trigger_motor[i],j) = restore_matrix.val(trigger_motor[i],j);
+					//if the muscle is still due to transition
+					ROS_INFO("Motor: %i, Transition: %i", trigger_motor[i], transition[i]);
+					if (transition[i]){
+						prev_level[i] = (motorPos[trigger_motor[i]][294]+motorPos[trigger_motor[i]][295]+motorPos[trigger_motor[i]][296])/3;
+						curr_level[i] = (motorPos[trigger_motor[i]][297]+motorPos[trigger_motor[i]][298]+motorPos[trigger_motor[i]][299])/3;
+						//ROS_INFO("%f, %f", prev_level[i], curr_level[i]);
+						if (trigger_edge){
+							if (prev_level[i] < trigger_level and curr_level[i] > trigger_level){
+								on[i] = 1;
 							}
-							// need to update current matrix in case another motor is updated before temp_matrix is sent i.e. during the same cycle
-							current_matrix = temp_matrix;
-							ROS_INFO("Motor: %i", trigger_motor[i]);
-							// transition is complete, end transition
-							transition[i] = false;
-							on[i] = 0;
-						} else if (transition_type == 1){
-							//calculate new matrix
-							double w0 = time_vec[i]/duration;
-							double w1 = 1.0-w0;
-							temp_matrix = restore_matrix*w0+current_matrix*w1;
-							
-							//if transition is complete, end transition for muscle
-							if (time_vec[i]/duration > 1.0){
+						} else {
+							if (prev_level[i] > trigger_level and curr_level[i] < trigger_level){
+								on[i] = 1;
+							}
+						}
+						// if the given muscle crosses the threshold, initialize/continue transition process and calculate the desired matrix
+						if (on[i]){
+							// if not yet initialized, initialize timer
+							if (start[i]){
+								time_vec[i] = 0.0;
+								start[i] = false;
+							}
+							if (transition_type == 0){
+								//calculate new matrix
+								temp_matrix = current_matrix;
+								for(int j=0; j<temp_matrix.getN(); j++){
+									temp_matrix.val(trigger_motor[i],j) = restore_matrix.val(trigger_motor[i],j);
+								}
+								// need to update current matrix in case another motor is updated before temp_matrix is sent i.e. during the same cycle
+								current_matrix = temp_matrix;
+								//ROS_INFO("Motor: %i", trigger_motor[i]);
+								// transition is complete, end transition
 								transition[i] = false;
 								on[i] = 0;
-							}
-						} else if (transition_type == 2){
-							//calculate new matrix
-							double w0 = sin(PI/duration*time_vec[i]-PI/2)/2+0.5;
-							double w1 = 1-w0;	
-							temp_matrix = restore_matrix*w0+current_matrix*w1;
-							
-							//if transition is complete, end transition for muscle
-							if (time_vec[i]/duration > 1.0){
-								transition[i] = false;
-								on[i] = 0;
+								publish = true;
+							} else if (transition_type == 1){
+								//calculate new matrix
+								double w0 = time_vec[i]/duration;
+								double w1 = 1.0-w0;
+								temp_matrix = restore_matrix*w0+current_matrix*w1;
+								
+								//if transition is complete, end transition for muscle
+								if (time_vec[i]/duration > 1.0){
+									transition[i] = false;
+									on[i] = 0;
+								}
+								publish = true;
+							} else if (transition_type == 2){
+								//calculate new matrix
+								double w0 = sin(PI/duration*time_vec[i]-PI/2)/2+0.5;
+								double w1 = 1-w0;	
+								temp_matrix = restore_matrix*w0+current_matrix*w1;
+								
+								//if transition is complete, end transition for muscle
+								if (time_vec[i]/duration > 1.0){
+									transition[i] = false;
+									on[i] = 0;
+								}
+								publish = true;
 							}
 						}
 					}
+				}
+				ROS_INFO("");
+				if (publish){
+					publishTempMatrix(temp_matrix);
 				}
 			} else {
 				// if the trigger is not enabled, but a transition is called, update full matrix immediately
+				matrix::Matrix temp_matrix;
 				temp_matrix = restore_matrix;
 				fill(transition.begin(),transition.end(),false);
 				fill(start.begin(),start.end(),false);
+				publishTempMatrix(temp_matrix);
 			}
-
-			// publish new matrix (in either case)
-			roboy_dep::depMatrix msg;
-			msg.size = temp_matrix.getM();
-			for (int i = 0; i < msg.size; i++) {
-				roboy_dep::cArray msg_temp;
-				msg_temp.size = temp_matrix.getN();
-				for (int j = 0; j < msg_temp.size; j++) {
-					msg_temp.cArray.push_back(temp_matrix.val(i,j));
-				}
-				msg.depMatrix.push_back(msg_temp);
-			}
-			depLoadMatrix.publish(msg);
-			ROS_INFO(" ");
 		}
+
 		// increment timer (for time dependent transitions i.e. ramp, sine)
 		time_ += 0.02;
 		for(int i=0;i<time_vec.size();i++){
@@ -854,6 +850,21 @@ void MainWindow::restoreMatrix(){
 					restore_matrix.val(i,j) = msg.depMatrix[i].cArray[j];
 				}
 			}
+
+			// obtain trigger_motor vector from delimited list committed by user in GUI
+			trigger_motor.clear();	
+			string s = ui->triggerMotor->text().toStdString();
+			std::vector<std::string> words;
+			boost::split(words, s, boost::is_any_of(", ;"), boost::token_compress_on);
+			//ROS_INFO("Trigger motors: ");
+			for (int i = 0; i < words.size(); i++){
+				trigger_motor.push_back(atoi(words[i].c_str()));
+				//ROS_INFO("%i", trigger_motor[i]);
+			}
+			//ROS_INFO("");
+			//obtain trigger level
+			trigger_level = atof(ui->triggerLevel->text().toStdString().c_str());
+
 			//initialize transition and start
 			transition.clear();
 			start.clear();

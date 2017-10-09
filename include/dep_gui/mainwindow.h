@@ -91,6 +91,7 @@ private:
 	std::chrono::high_resolution_clock::time_point t_start;
 	bool publish_combination = false;
 	void publishLinearCombination(); 
+	void publishTempMatrix(matrix::Matrix temp_matrix);
 	void updateComponentList();
 	//trigger vars
 	double trigger_level;

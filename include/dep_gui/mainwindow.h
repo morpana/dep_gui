@@ -94,16 +94,16 @@ private:
 	void publishTempMatrix(matrix::Matrix temp_matrix);
 	void updateComponentList();
 	//trigger vars
-	double trigger_level;
+	vector<double> trigger_level;
 	vector<int> trigger_motor;
-	bool trigger_edge;
+	vector<unsigned char> trigger_edge;
 	bool trigger_on;
 	string prev_filename;
 Q_SIGNALS:
 	void newDepMatrix();
 	void newMotorData();
 private Q_SLOTS:
-	void toggleTriggerEdge();
+	//void toggleTriggerEdge();
 	void toggleTrigger();
 	void stepTransition();
 	void rampTransition();

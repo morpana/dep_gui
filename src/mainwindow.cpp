@@ -187,10 +187,10 @@ MainWindow::MainWindow(QWidget *parent) :
 	transition =  {false};
 	transition_type = 0;
 
-	QObject::connect(ui->triggerEdge, SIGNAL(released()), this, SLOT(toggleTriggerEdge()));
+	//QObject::connect(ui->triggerEdge, SIGNAL(released()), this, SLOT(toggleTriggerEdge()));
 	QObject::connect(ui->setTrigger, SIGNAL(released()), this, SLOT(toggleTrigger()));
-	trigger_level = 0.0;
-	trigger_edge = 1;
+	//(trigger_level = {0.0};
+	//trigger_edge = {1};
 	//trigger_motor = {0};
 	trigger_on = 0;
 
@@ -227,6 +227,7 @@ void MainWindow::plotDepMatrix_2(){
 	ui->customPlot->replot();
 }*/
 
+/*
 void MainWindow::toggleTriggerEdge(){
 	trigger_edge = (trigger_edge != true);
 	if (trigger_edge == 1){
@@ -234,7 +235,7 @@ void MainWindow::toggleTriggerEdge(){
 	} else {
 		ui->edgeText->setText("Falling edge");
 	}
-}
+}*/
 
 void MainWindow::toggleTrigger(){
 	trigger_on = (trigger_on != true);
@@ -354,17 +355,16 @@ void MainWindow::publishLinearCombination(){
 				bool publish = false;
 				for(int i=0; i < trigger_motor.size(); i++){
 					//if the muscle is still due to transition
-					ROS_INFO("Motor: %i, Transition: %i", trigger_motor[i], transition[i]);
 					if (transition[i]){
 						prev_level[i] = (motorPos[trigger_motor[i]][294]+motorPos[trigger_motor[i]][295]+motorPos[trigger_motor[i]][296])/3;
 						curr_level[i] = (motorPos[trigger_motor[i]][297]+motorPos[trigger_motor[i]][298]+motorPos[trigger_motor[i]][299])/3;
 						//ROS_INFO("%f, %f", prev_level[i], curr_level[i]);
-						if (trigger_edge){
-							if (prev_level[i] < trigger_level and curr_level[i] > trigger_level){
+						if (trigger_edge[i]){
+							if (prev_level[i] < trigger_level[i] and curr_level[i] > trigger_level[i]){
 								on[i] = 1;
 							}
 						} else {
-							if (prev_level[i] > trigger_level and curr_level[i] < trigger_level){
+							if (prev_level[i] > trigger_level[i] and curr_level[i] < trigger_level[i]){
 								on[i] = 1;
 							}
 						}
@@ -416,7 +416,6 @@ void MainWindow::publishLinearCombination(){
 						}
 					}
 				}
-				ROS_INFO("");
 				if (publish){
 					publishTempMatrix(temp_matrix);
 				}
@@ -856,14 +855,29 @@ void MainWindow::restoreMatrix(){
 			string s = ui->triggerMotor->text().toStdString();
 			std::vector<std::string> words;
 			boost::split(words, s, boost::is_any_of(", ;"), boost::token_compress_on);
-			//ROS_INFO("Trigger motors: ");
 			for (int i = 0; i < words.size(); i++){
 				trigger_motor.push_back(atoi(words[i].c_str()));
-				//ROS_INFO("%i", trigger_motor[i]);
 			}
-			//ROS_INFO("");
+
 			//obtain trigger level
-			trigger_level = atof(ui->triggerLevel->text().toStdString().c_str());
+			trigger_level.clear();	
+			s = ui->triggerLevel->text().toStdString();
+			boost::split(words, s, boost::is_any_of(", ;"), boost::token_compress_on);
+			for (int i = 0; i < words.size(); i++){
+				trigger_level.push_back(atof(words[i].c_str()));
+			}
+
+			//obtain trigger edges
+			trigger_edge.clear();	
+			s = ui->triggerEdge->text().toStdString();
+			boost::split(words, s, boost::is_any_of(", ;"), boost::token_compress_on);
+			for (int i = 0; i < words.size(); i++){
+				if(atoi(words[i].c_str()) == 1){
+					trigger_edge.push_back(true);
+				} else {
+					trigger_edge.push_back(false);
+				}
+			}
 
 			//initialize transition and start
 			transition.clear();

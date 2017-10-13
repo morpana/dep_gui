@@ -12,6 +12,8 @@
 #include "roboy_dep/cArray.h"
 #include "roboy_dep/depMatrix.h"
 #include "roboy_dep/transition.h"
+#include "roboy_dep/transition_start.h"
+
 #include <roboy_communication_middleware/MotorConfig.h>
 #include <roboy_communication_middleware/MotorStatus.h>
 
@@ -50,7 +52,7 @@ public:
 private:
 	Ui::MainWindow *ui;
 	ros::NodeHandlePtr nh;
-	ros::Publisher depCommand, motorConfig, depParameters, depLoadMatrix, transition_pub;
+	ros::Publisher depCommand, motorConfig, depParameters, depLoadMatrix, transition_pub, transition_start_pub;
 	ros::Subscriber depMatrix, motorStatus;
 	boost::shared_ptr<ros::AsyncSpinner> spinner;
 

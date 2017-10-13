@@ -195,6 +195,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	trigger_on = 0;
 
 	transition_pub = nh->advertise<roboy_dep::transition>("/roboy_dep/transition", 1);
+	transition_start_pub = nh->advertise<roboy_dep::transition_start>("/roboy_dep/transition_start", 1);
 	prev_filename = "None";
 
 	time_ = 0.0;
@@ -352,10 +353,12 @@ void MainWindow::publishLinearCombination(){
 			// if trigger enabled, calculate matrix accordingly
 			if (trigger_on){
 				// flag to publish if any update to matrix after going through all muscles
+				ROS_INFO("trigger_on");
 				bool publish = false;
 				for(int i=0; i < trigger_motor.size(); i++){
 					//if the muscle is still due to transition
 					if (transition[i]){
+						ROS_INFO("transition[%i]", i);
 						prev_level[i] = (motorPos[trigger_motor[i]][294]+motorPos[trigger_motor[i]][295]+motorPos[trigger_motor[i]][296])/3;
 						curr_level[i] = (motorPos[trigger_motor[i]][297]+motorPos[trigger_motor[i]][298]+motorPos[trigger_motor[i]][299])/3;
 						//ROS_INFO("%f, %f", prev_level[i], curr_level[i]);
@@ -370,10 +373,15 @@ void MainWindow::publishLinearCombination(){
 						}
 						// if the given muscle crosses the threshold, initialize/continue transition process and calculate the desired matrix
 						if (on[i]){
+							ROS_INFO("on[%i]", i);
 							// if not yet initialized, initialize timer
 							if (start[i]){
+								ROS_INFO("start[%i]",i);
 								time_vec[i] = 0.0;
 								start[i] = false;
+								roboy_dep::transition_start msg;
+								msg.motor = i;
+								transition_start_pub.publish(msg);
 							}
 							if (transition_type == 0){
 								//calculate new matrix

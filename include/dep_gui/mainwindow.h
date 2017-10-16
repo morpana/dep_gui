@@ -12,6 +12,8 @@
 #include "roboy_dep/cArray.h"
 #include "roboy_dep/depMatrix.h"
 #include "roboy_dep/transition.h"
+//#include "roboy_dep/transition_start.h"
+
 #include <roboy_communication_middleware/MotorConfig.h>
 #include <roboy_communication_middleware/MotorStatus.h>
 
@@ -50,7 +52,7 @@ public:
 private:
 	Ui::MainWindow *ui;
 	ros::NodeHandlePtr nh;
-	ros::Publisher depCommand, motorConfig, depParameters, depLoadMatrix, transition_pub;
+	ros::Publisher depCommand, motorConfig, depParameters, depLoadMatrix, transition_pub;//, transition_start_pub;
 	ros::Subscriber depMatrix, motorStatus;
 	boost::shared_ptr<ros::AsyncSpinner> spinner;
 
@@ -84,13 +86,14 @@ private:
 	int transition_type;
 	bool transition;
 	double duration;
-	matrix::Matrix current_matrix, restore_matrix;
+	matrix::Matrix current_matrix, restore_matrix, previous_matrix;
 	double time_;
 	std::chrono::high_resolution_clock::time_point t_start;
 	bool start;
 	bool publish_combination = false;
 	void publishLinearCombination(); 
 	void updateComponentList();
+	void publishTempMatrix(matrix::Matrix temp_matrix);
 	//trigger vars
 	double trigger_level;
 	int trigger_motor;

@@ -48,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	motors = 14;
 	sensors = 14*2;
 	current_matrix = matrix::Matrix(motors,sensors);
+	previous_matrix = matrix::Matrix(motors,sensors);
 	// configure axis rect:
 	ui->customPlot->xAxis->setLabel("motor");
 	ui->customPlot->yAxis->setLabel("sensor");
@@ -193,6 +194,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	trigger_on = 0;
 
 	transition_pub = nh->advertise<roboy_dep::transition>("/roboy_dep/transition", 1);
+	//transition_start_pub = nh->advertise<roboy_dep::transition_start>("/roboy_dep/transition_start", 1);
 	prev_filename = "None";
 }
 
@@ -236,12 +238,13 @@ void MainWindow::toggleTrigger(){
 	trigger_on = (trigger_on != true);
 	if (trigger_on == 0){
 		ui->triggerText->setText("Off");
+		transition_type = 0;
 	} else {
 		ui->triggerText->setText("On");
 	}	
 	trigger_level = atof(ui->triggerLevel->text().toStdString().c_str());
 	trigger_motor = atoi(ui->triggerMotor->cleanText().toStdString().c_str());
-
+	//ROS_INFO("%i", trigger_on);
 }
 
 void MainWindow::stepTransition(){
@@ -253,7 +256,7 @@ void MainWindow::rampTransition(){
 }
 void MainWindow::sineTransition(){
 	transition_type = 2;
-	duration = atof(ui->ramp_transition_duration->text().toStdString().c_str());
+	duration = atof(ui->sine_transition_duration->text().toStdString().c_str());
 }
 
 
@@ -302,6 +305,21 @@ void MainWindow::removeMatrix_2(){
 	}
 }
 
+void MainWindow::publishTempMatrix(matrix::Matrix temp_matrix){
+	// publish new matrix
+	roboy_dep::depMatrix msg;
+	msg.size = temp_matrix.getM();
+	for (int i = 0; i < msg.size; i++) {
+		roboy_dep::cArray msg_temp;
+		msg_temp.size = temp_matrix.getN();
+		for (int j = 0; j < msg_temp.size; j++) {
+			msg_temp.cArray.push_back(temp_matrix.val(i,j));
+		}
+		msg.depMatrix.push_back(msg_temp);
+	}
+	depLoadMatrix.publish(msg);
+}
+
 void MainWindow::publishLinearCombination(){
 	bool on = false;
 	double prev_level = 0.0;
@@ -309,14 +327,16 @@ void MainWindow::publishLinearCombination(){
 	while (1){
 		t_start = std::chrono::high_resolution_clock::now();
 
-		matrix::Matrix temp_matrix;
 		if (publish_combination){
+			matrix::Matrix temp_matrix;
 			temp_matrix = lin.out(time_);
+			publishTempMatrix(temp_matrix);
 		} else if (transition){
+			matrix::Matrix temp_matrix;
 			if (trigger_on){
 				prev_level = (motorPos[trigger_motor][294]+motorPos[trigger_motor][295]+motorPos[trigger_motor][296])/3;
 				curr_level = (motorPos[trigger_motor][297]+motorPos[trigger_motor][298]+motorPos[trigger_motor][299])/3;
-				ROS_INFO("%f, %f", prev_level, curr_level);
+				//ROS_INFO("%f, %f", prev_level, curr_level);
 				if (trigger_edge){
 					if (prev_level < trigger_level and curr_level > trigger_level){
 						on = 1;
@@ -333,37 +353,34 @@ void MainWindow::publishLinearCombination(){
 				if (start){
 					time_ = 0.0;
 					start = false;
+					previous_matrix = current_matrix;
 				}
 				if (transition_type == 0){
 					temp_matrix = restore_matrix;
+					transition = false;
+					on = 0;
 				} else if (transition_type == 1){
 					double w0 = time_/duration;
-					double w1 = 1-w0;
-					temp_matrix = restore_matrix*w0+current_matrix*w1;
+					double w1 = 1.0-w0;
+					ROS_INFO("w0: %f, w1: %f",w0, w1);
+					temp_matrix = previous_matrix*w1 + restore_matrix*w0;
+					if (time_/duration > 1.0){
+						transition = false;
+						on = 0;
+					}
 				} else if (transition_type == 2){
 					double w0 = sin(PI/duration*time_-PI/4)/2+0.5;
-					double w1 = 1-w0;
-					temp_matrix = restore_matrix*w0+current_matrix*w1;
+					double w1 = 1.0-w0;
+					temp_matrix = previous_matrix*w1 + restore_matrix*w0;
+					if (time_/duration > 1.0){
+						transition = false;
+						on = 0;
+					}
 				}
+				publishTempMatrix(temp_matrix);
 			}
 		}
-		if (publish_combination or on){
-			roboy_dep::depMatrix msg;
-			msg.size = temp_matrix.getM();
-			for (int i = 0; i < msg.size; i++) {
-				roboy_dep::cArray msg_temp;
-				msg_temp.size = temp_matrix.getN();
-				for (int j = 0; j < msg_temp.size; j++) {
-					msg_temp.cArray.push_back(temp_matrix.val(i,j));
-				}
-				msg.depMatrix.push_back(msg_temp);
-			}
-			depLoadMatrix.publish(msg);
-			if (time_/duration > 1.0){
-				transition = 0;
-				on = 0;
-			}
-		}
+
 		std::chrono::high_resolution_clock::time_point t_end = std::chrono::high_resolution_clock::now();
 		auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(t_end - t_start).count();
 		while(diff < 20){

@@ -196,6 +196,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	transition_pub = nh->advertise<roboy_dep::transition>("/roboy_dep/transition", 1);
 	//transition_start_pub = nh->advertise<roboy_dep::transition_start>("/roboy_dep/transition_start", 1);
 	prev_filename = "None";
+
+	linear_combination_pub = nh->advertise<roboy_dep::linear_combination>("/roboy_dep/linear_combination", 1);
 }
 
 MainWindow::~MainWindow()
@@ -328,9 +330,14 @@ void MainWindow::publishLinearCombination(){
 		t_start = std::chrono::high_resolution_clock::now();
 
 		if (publish_combination){
+			// publish combination matrix
 			matrix::Matrix temp_matrix;
 			temp_matrix = lin.out(time_);
 			publishTempMatrix(temp_matrix);
+			// publish combination weights
+			roboy_dep::linear_combination msg;
+			msg = lin.pub(time_);
+			linear_combination_pub.publish(msg);
 		} else if (transition){
 			matrix::Matrix temp_matrix;
 			if (trigger_on){
@@ -400,6 +407,7 @@ void MainWindow::togglePubLinComb(){
 		if (publish_combination){
 			ui->combinationLabel->setText("Combination: Enabled");
 			learning = false;
+			time_ = 0;
 			ui->learningLabel->setText("Learning: Disabled");
 		} else {
 			ui->combinationLabel->setText("Combination: Disabled");

@@ -133,6 +133,13 @@ class linearCombination {
 		void addMatrix(matrix::Matrix matr){
 			m.push_back(matr);
 		}
+		roboy_dep::linear_combination pub(double time){
+			roboy_dep::linear_combination msg;
+			for (int i = 0; i < m.size(); i++){
+				msg.weights.push_back(f[i].out(time));
+			}
+			return msg;
+		}
 		matrix::Matrix out(double time){
 			matrix::Matrix y = matrix::Matrix(m[0].getM(),m[0].getN());
 			for (int i = 0; i < m.size(); i++){

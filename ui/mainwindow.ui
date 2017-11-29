@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1514</width>
-    <height>999</height>
+    <width>1762</width>
+    <height>889</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <rect>
       <x>0</x>
       <y>10</y>
-      <width>1501</width>
+      <width>1941</width>
       <height>931</height>
      </rect>
     </property>
@@ -1865,6 +1865,142 @@
        </property>
       </widget>
      </widget>
+     <widget class="QFrame" name="frame_41">
+      <property name="geometry">
+       <rect>
+        <x>1500</x>
+        <y>0</y>
+        <width>261</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <widget class="QPushButton" name="loadID">
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>70</y>
+         <width>81</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Load id</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_41">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>59</width>
+         <height>14</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Brain id</string>
+       </property>
+      </widget>
+      <widget class="QFrame" name="frame_44">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>241</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QSlider" name="IDSlider">
+        <property name="geometry">
+         <rect>
+          <x>9</x>
+          <y>10</y>
+          <width>131</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="brainID">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>10</y>
+          <width>81</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0.125</string>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+     <widget class="QPushButton" name="zero_button">
+      <property name="geometry">
+       <rect>
+        <x>1530</x>
+        <y>130</y>
+        <width>80</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>zero</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="fb_button">
+      <property name="geometry">
+       <rect>
+        <x>1530</x>
+        <y>160</y>
+        <width>80</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>front_back</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="fs_button">
+      <property name="geometry">
+       <rect>
+        <x>1530</x>
+        <y>190</y>
+        <width>80</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>front_side</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="sd_button">
+      <property name="geometry">
+       <rect>
+        <x>1530</x>
+        <y>220</y>
+        <width>80</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>side_down</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_9">
      <attribute name="title">
@@ -2874,7 +3010,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1514</width>
+     <width>1762</width>
      <height>19</height>
     </rect>
    </property>

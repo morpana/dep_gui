@@ -40,7 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
 	QObject::connect(signalMapper, SIGNAL(mapped(QString)), this, SLOT(sendCommand(QString)));
 
 	QObject::connect(ui->toggleLearning, SIGNAL(released()), this, SLOT(toggleLearning()));
-	QObject::connect(ui->updateController, SIGNAL(released()), this, SLOT(setMotorConfig()));
+	// THIS IS BROKEN
+	//QObject::connect(ui->updateController, SIGNAL(released()), this, SLOT(setMotorConfig()));
 	QObject::connect(ui->updateDepParams, SIGNAL(released()), this, SLOT(setDepConfig()));
 
 	QObject::connect(ui->saveMatrix, SIGNAL(released()), this, SLOT(storeMatrix()));
@@ -84,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	spinner = boost::shared_ptr<ros::AsyncSpinner>(new ros::AsyncSpinner(5));
 	spinner->start();
 
-	learning = 1;
+	learning = 0;
 
 	string temp(getenv("HOME"));
 	directory = temp;
@@ -200,15 +201,24 @@ MainWindow::MainWindow(QWidget *parent) :
 	linear_combination_pub = nh->advertise<roboy_dep::linear_combination>("/roboy_dep/linear_combination", 1);
 
 	// brain id
-    QObject::connect(ui->IDSlider, SIGNAL(valueChanged(int)), this, SLOT(brainIdTrigger()));
-    QObject::connect(ui->loadID, SIGNAL(released()), this, SLOT(loadbrainId()));
+    //QObject::connect(ui->IDSlider, SIGNAL(valueChanged(int)), this, SLOT(brainIdTrigger()));
+    //QObject::connect(ui->loadID, SIGNAL(released()), this, SLOT(loadbrainId()));
     brain_id_pub = nh->advertise<roboy_dep::brain_id>("/roboy_dep/brain_id", 1);	
-
 
     QObject::connect(ui->zero_button, SIGNAL(released()), this, SLOT(zero_behavior()));
     QObject::connect(ui->fb_button, SIGNAL(released()), this, SLOT(fb_behavior()));
     QObject::connect(ui->fs_button, SIGNAL(released()), this, SLOT(fs_behavior()));
     QObject::connect(ui->sd_button, SIGNAL(released()), this, SLOT(sd_behavior()));
+
+    QObject::connect(ui->VelSlider, SIGNAL(valueChanged(int)), this, SLOT(vel_slider()));
+    QObject::connect(ui->loadVel, SIGNAL(released()), this, SLOT(loadVel()));
+
+    QObject::connect(ui->AmpSlider, SIGNAL(valueChanged(int)), this, SLOT(Amp_slider()));
+    QObject::connect(ui->loadAmp, SIGNAL(released()), this, SLOT(loadAmp()));
+
+    QObject::connect(ui->stop_button, SIGNAL(released()), this, SLOT(stop_toggle()));
+    stop_pub = nh->advertise<roboy_dep::stop>("/roboy_dep/stop", 1);
+    stop = 0;
 }
 
 MainWindow::~MainWindow()
@@ -238,6 +248,72 @@ void MainWindow::plotDepMatrix_2(){
 	ui->customPlot->replot();
 }*/
 
+/*
+void MainWindow::loadbrainId(){
+	float brain_id = atof(ui->brainID->text().toStdString().c_str());
+	//ROS_INFO("%f", brain_id);
+	roboy_dep::brain_id msg;
+	msg.brain_id = brain_id;
+	brain_id_pub.publish(msg);
+}
+
+void MainWindow::brainIdTrigger(){
+	int percent = ui->IDSlider->value();
+	//ROS_INFO("%i", value);
+	float brain_id = percent/100.0;
+	ui->brainID->setText(QString::number(brain_id));
+}*/
+
+
+void MainWindow::stop_toggle(){
+	stop = (stop != true);
+	if (stop == 1){
+		ui->stop_button->setText("Continue");
+	} else {
+		ui->stop_button->setText("Stop");
+	}
+	roboy_dep::stop msg;
+	msg.stop = stop;
+	//ROS_INFO("%i", stop);
+	stop_pub.publish(stop);
+}
+
+void MainWindow::loadAmp(){
+	// this is a bit of a hack, but...
+	float Amp = atof(ui->Amp->text().toStdString().c_str());
+	ui->amplitude->setText(QString::number(Amp));
+	//ROS_INFO("%i", vel);
+	setDepConfig();
+}
+
+void MainWindow::Amp_slider(){
+	int Amp = ui->AmpSlider->value();
+	if (Amp < 60){
+		Amp = 60;
+	}
+	ui->Amp->setText(QString::number(float(Amp)/100.));
+}
+
+void MainWindow::loadVel(){
+	// this is a bit of a hack, but...
+	int vel = atoi(ui->Vel->text().toStdString().c_str());
+	ui->delay->setText(QString::number(vel));
+	//ROS_INFO("%i", vel);
+	setDepConfig();
+}
+
+void MainWindow::vel_slider(){
+	int vel = ui->VelSlider->value();
+	if (vel < 10){
+		vel = 10;
+	}
+	if (vel > 90){
+		vel = 90;
+	}
+	ui->Vel->setText(QString::number(vel));
+}
+
+
 void MainWindow::zero_behavior(){
 	roboy_dep::brain_id msg;
 	msg.brain_id = 0.125;
@@ -260,21 +336,6 @@ void MainWindow::sd_behavior(){
 	roboy_dep::brain_id msg;
 	msg.brain_id = 0.875;
 	brain_id_pub.publish(msg);
-}
-
-void MainWindow::loadbrainId(){
-	float brain_id = atof(ui->brainID->text().toStdString().c_str());
-	//ROS_INFO("%f", brain_id);
-	roboy_dep::brain_id msg;
-	msg.brain_id = brain_id;
-	brain_id_pub.publish(msg);
-}
-
-void MainWindow::brainIdTrigger(){
-	int percent = ui->IDSlider->value();
-	//ROS_INFO("%i", value);
-	float brain_id = percent/100.0;
-	ui->brainID->setText(QString::number(brain_id));
 }
 
 void MainWindow::toggleTriggerEdge(){
@@ -415,6 +476,7 @@ void MainWindow::publishLinearCombination(){
 				if (transition_type == 0){
 					temp_matrix = restore_matrix;
 					transition = false;
+					//
 					on = 0;
 				} else if (transition_type == 1){
 					double w0 = time_/duration;
@@ -878,6 +940,8 @@ void MainWindow::sendCommand(QString s){
 	depCommand.publish(msg);
 }
 
+// THIS DOESNT WORK PROPERLY
+/*
 void MainWindow::setMotorConfig() {
 	roboy_communication_middleware::MotorConfig msg;
 	for (uint motor = 0; motor < NUMBER_OF_MOTORS_PER_FPGA; motor++) {
@@ -903,7 +967,7 @@ void MainWindow::setMotorConfig() {
 	}
 	motorConfig.publish(msg);
 	//cout << ui->control_mode->value();
-}
+}*/
 
 void MainWindow::setDepConfig(){
 	roboy_dep::depParameters msg;
@@ -919,6 +983,7 @@ void MainWindow::setDepConfig(){
 	msg.springMult1 = stod(ui->springMult1->text().toStdString().c_str());
 	msg.springMult2 = stod(ui->springMult2->text().toStdString().c_str());
 	msg.diff = stod(ui->diff->text().toStdString().c_str());
+	msg.amplitude = atof(ui->amplitude->text().toStdString().c_str());
 	msg.delay = atoi(ui->delay->text().toStdString().c_str());
 	msg.guideType = atoi(ui->guideType->text().toStdString().c_str());
 	msg.guideIdx = atoi(ui->guideIdx->text().toStdString().c_str());

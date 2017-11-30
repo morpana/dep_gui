@@ -33,8 +33,8 @@
      <widget class="QFrame" name="frame_31">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>150</y>
+        <x>370</x>
+        <y>0</y>
         <width>351</width>
         <height>271</height>
        </rect>
@@ -144,7 +144,7 @@
          <number>2</number>
         </property>
         <property name="value">
-         <number>0</number>
+         <number>2</number>
         </property>
        </widget>
       </widget>
@@ -299,7 +299,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>80</string>
+         <string>1</string>
         </property>
        </widget>
        <widget class="QLabel" name="label">
@@ -485,7 +485,7 @@
      <widget class="QFrame" name="frame_33">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>730</x>
         <y>0</y>
         <width>321</width>
         <height>671</height>
@@ -514,7 +514,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>560</y>
+         <y>590</y>
          <width>301</width>
          <height>31</height>
         </rect>
@@ -527,7 +527,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>520</y>
+         <y>550</y>
          <width>301</width>
          <height>31</height>
         </rect>
@@ -695,7 +695,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>490</y>
+         <y>520</y>
          <width>301</width>
          <height>31</height>
         </rect>
@@ -905,7 +905,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>460</y>
+         <y>490</y>
          <width>301</width>
          <height>31</height>
         </rect>
@@ -1073,7 +1073,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>400</y>
+         <y>430</y>
          <width>301</width>
          <height>31</height>
         </rect>
@@ -1115,7 +1115,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>430</y>
+         <y>460</y>
          <width>301</width>
          <height>31</height>
         </rect>
@@ -1279,7 +1279,124 @@
         </property>
        </widget>
       </widget>
+      <widget class="QFrame" name="frame_39">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>400</y>
+         <width>301</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QLabel" name="label_39">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>0</y>
+          <width>101</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>amplitude</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="amplitude">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>0</y>
+          <width>121</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>1.0</string>
+        </property>
+       </widget>
+      </widget>
      </widget>
+     <widget class="QLabel" name="label_38">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>280</y>
+        <width>341</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="textBrowser">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>280</y>
+        <width>351</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;* Broken *&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Motor Configuration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Control modes: &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;0 = Force&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1 = Velocity&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2 = Position&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Note: &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;For position control Kp should is set small (default = 1)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="textBrowser_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>150</y>
+        <width>351</width>
+        <height>291</height>
+       </rect>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Initialization procedure&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. Click &amp;quot;force mode&amp;quot; for arm to enter force mode&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. Move the arm to a central position&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;3. Hold the arm in position and restart the arm by pushing on the red stop button, then turning it back up; this is to reset the zero point of the motors&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;4. While holding the arm, click &amp;quot;set initial position&amp;quot;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;5. Let go of the arm, and click update mode to start the network&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;6. Select and observe the behavior of the DEP network and of the arm in the &amp;quot;DEP Matrix&amp;quot; tab&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <zorder>frame_31</zorder>
+     <zorder>frame_32</zorder>
+     <zorder>frame_33</zorder>
+     <zorder>label_31</zorder>
+     <zorder>label_38</zorder>
+     <zorder>textBrowser</zorder>
+     <zorder>textBrowser_2</zorder>
     </widget>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -1338,7 +1455,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Learning: Enabled</string>
+         <string>Learning: Disabled</string>
         </property>
        </widget>
       </widget>
@@ -1871,7 +1988,7 @@
         <x>1500</x>
         <y>0</y>
         <width>261</width>
-        <height>101</height>
+        <height>691</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -1880,17 +1997,17 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QPushButton" name="loadID">
+      <widget class="QPushButton" name="loadAmp">
        <property name="geometry">
         <rect>
          <x>160</x>
          <y>70</y>
-         <width>81</width>
+         <width>91</width>
          <height>21</height>
         </rect>
        </property>
        <property name="text">
-        <string>Load id</string>
+        <string>Amplitude</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_41">
@@ -1898,12 +2015,12 @@
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>59</width>
-         <height>14</height>
+         <width>101</width>
+         <height>16</height>
         </rect>
        </property>
        <property name="text">
-        <string>Brain id</string>
+        <string>Behavior Control</string>
        </property>
       </widget>
       <widget class="QFrame" name="frame_44">
@@ -1921,7 +2038,7 @@
        <property name="frameShadow">
         <enum>QFrame::Raised</enum>
        </property>
-       <widget class="QSlider" name="IDSlider">
+       <widget class="QSlider" name="AmpSlider">
         <property name="geometry">
          <rect>
           <x>9</x>
@@ -1934,7 +2051,7 @@
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
-       <widget class="QLineEdit" name="brainID">
+       <widget class="QLineEdit" name="Amp">
         <property name="geometry">
          <rect>
           <x>150</x>
@@ -1944,62 +2061,145 @@
          </rect>
         </property>
         <property name="text">
-         <string>0.125</string>
+         <string>1.0</string>
         </property>
        </widget>
       </widget>
-     </widget>
-     <widget class="QPushButton" name="zero_button">
-      <property name="geometry">
-       <rect>
-        <x>1530</x>
-        <y>130</y>
-        <width>80</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>zero</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="fb_button">
-      <property name="geometry">
-       <rect>
-        <x>1530</x>
-        <y>160</y>
-        <width>80</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>front_back</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="fs_button">
-      <property name="geometry">
-       <rect>
-        <x>1530</x>
-        <y>190</y>
-        <width>80</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>front_side</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="sd_button">
-      <property name="geometry">
-       <rect>
-        <x>1530</x>
-        <y>220</y>
-        <width>80</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>side_down</string>
-      </property>
+      <widget class="QPushButton" name="sd_button">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>320</y>
+         <width>80</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>side_down</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="zero_button">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>230</y>
+         <width>80</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>zero</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="fs_button">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>290</y>
+         <width>80</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>front_side</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="fb_button">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>260</y>
+         <width>80</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>front_back</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="loadVel">
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>140</y>
+         <width>91</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Velocity</string>
+       </property>
+      </widget>
+      <widget class="QFrame" name="frame_45">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>100</y>
+         <width>241</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <widget class="QSlider" name="VelSlider">
+        <property name="geometry">
+         <rect>
+          <x>9</x>
+          <y>10</y>
+          <width>131</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="Vel">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>10</y>
+          <width>81</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>50</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QPushButton" name="stop_button">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>170</y>
+         <width>241</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Stop</string>
+       </property>
+      </widget>
+      <zorder>loadAmp</zorder>
+      <zorder>label_41</zorder>
+      <zorder>frame_44</zorder>
+      <zorder>sd_button</zorder>
+      <zorder>zero_button</zorder>
+      <zorder>fs_button</zorder>
+      <zorder>fb_button</zorder>
+      <zorder>sd_button</zorder>
+      <zorder>zero_button</zorder>
+      <zorder>fs_button</zorder>
+      <zorder>fb_button</zorder>
+      <zorder>loadVel</zorder>
+      <zorder>frame_45</zorder>
+      <zorder>stop_button</zorder>
+      <zorder>Amp</zorder>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_9">

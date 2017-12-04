@@ -200,9 +200,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	linear_combination_pub = nh->advertise<roboy_dep::linear_combination>("/roboy_dep/linear_combination", 1);
 
-	// brain id
-    //QObject::connect(ui->IDSlider, SIGNAL(valueChanged(int)), this, SLOT(brainIdTrigger()));
-    //QObject::connect(ui->loadID, SIGNAL(released()), this, SLOT(loadbrainId()));
     brain_id_pub = nh->advertise<roboy_dep::brain_id>("/roboy_dep/brain_id", 1);	
 
     QObject::connect(ui->zero_button, SIGNAL(released()), this, SLOT(zero_behavior()));
@@ -219,6 +216,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->stop_button, SIGNAL(released()), this, SLOT(stop_toggle()));
     stop_pub = nh->advertise<roboy_dep::stop>("/roboy_dep/stop", 1);
     stop = 0;
+
+    trigger_pub = nh->advertise<roboy_dep::trigger_ref>("/roboy_dep/trigger_ref", 1);
 }
 
 MainWindow::~MainWindow()
@@ -248,21 +247,6 @@ void MainWindow::plotDepMatrix_2(){
 	ui->customPlot->replot();
 }*/
 
-/*
-void MainWindow::loadbrainId(){
-	float brain_id = atof(ui->brainID->text().toStdString().c_str());
-	//ROS_INFO("%f", brain_id);
-	roboy_dep::brain_id msg;
-	msg.brain_id = brain_id;
-	brain_id_pub.publish(msg);
-}
-
-void MainWindow::brainIdTrigger(){
-	int percent = ui->IDSlider->value();
-	//ROS_INFO("%i", value);
-	float brain_id = percent/100.0;
-	ui->brainID->setText(QString::number(brain_id));
-}*/
 
 
 void MainWindow::stop_toggle(){
@@ -316,26 +300,61 @@ void MainWindow::vel_slider(){
 
 void MainWindow::zero_behavior(){
 	roboy_dep::brain_id msg;
-	msg.brain_id = 0.125;
+	msg.brain_id = 0;
 	brain_id_pub.publish(msg);
+
+	roboy_dep::trigger_ref msg1;
+	double arr[] = {0.0,0.0};
+	vector<double> vec (arr, arr + sizeof(arr) / sizeof(arr[0]) );
+	msg1.pos = vec;
+	msg1.vel = vec;
+	
+	trigger_pub.publish(msg1);
 }
 
 void MainWindow::fb_behavior(){
 	roboy_dep::brain_id msg;
-	msg.brain_id = 0.375;
+	msg.brain_id = 21.;
 	brain_id_pub.publish(msg);
+
+	roboy_dep::trigger_ref msg1;
+	double arr[] = {0.0,0.0};
+	vector<double> vec (arr, arr + sizeof(arr) / sizeof(arr[0]) );
+	msg1.pos = vec;
+	vec[1] = 1.0;
+	msg1.vel = vec;
+	
+	trigger_pub.publish(msg1);
 }
 
 void MainWindow::fs_behavior(){
 	roboy_dep::brain_id msg;
-	msg.brain_id = 0.625;
+	msg.brain_id = 42.;
 	brain_id_pub.publish(msg);
+
+	roboy_dep::trigger_ref msg1;
+	double arr[] = {0.0,0.0};
+	vector<double> vec (arr, arr + sizeof(arr) / sizeof(arr[0]) );
+	msg1.pos = vec;
+	vec[1] = 1.0;
+	msg1.vel = vec;
+	
+	trigger_pub.publish(msg1);
 }
 
 void MainWindow::sd_behavior(){
 	roboy_dep::brain_id msg;
-	msg.brain_id = 0.875;
+	msg.brain_id = 63.;
 	brain_id_pub.publish(msg);
+
+	roboy_dep::trigger_ref msg1;
+	double arr[] = {0.0,0.0};
+	vector<double> vec (arr, arr + sizeof(arr) / sizeof(arr[0]) );
+	msg1.pos = vec;
+	vec[1] = 1.0;
+	msg1.vel = vec;
+	
+	trigger_pub.publish(msg1);
 }
 
 void MainWindow::toggleTriggerEdge(){

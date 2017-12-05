@@ -223,6 +223,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     trigger_pub = nh->advertise<roboy_dep::trigger_ref>("/roboy_dep/trigger_ref", 1);
     tran_dir_pub = nh->advertise<roboy_dep::transition_direction>("/roboy_dep/transition_direction", 1);
+
+    QObject::connect(ui->call_script_button, SIGNAL(released()), this, SLOT(call_brain_script()));
+    script_pub = nh->advertise<roboy_dep::start_script>("/roboy_dep/start_script", 1);
 }
 
 MainWindow::~MainWindow()
@@ -252,7 +255,11 @@ void MainWindow::plotDepMatrix_2(){
 	ui->customPlot->replot();
 }*/
 
-
+void MainWindow::call_brain_script(){
+	roboy_dep::start_script msg;
+	msg.start = true;
+	script_pub.publish(msg);
+}
 
 void MainWindow::stop_toggle(){
 	stop = (stop != true);

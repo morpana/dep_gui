@@ -2069,52 +2069,52 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>320</y>
-         <width>80</width>
+         <y>290</y>
+         <width>111</width>
          <height>22</height>
         </rect>
        </property>
        <property name="text">
-        <string>side_down</string>
+        <string>side_down_up</string>
        </property>
       </widget>
       <widget class="QPushButton" name="zero_button">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>230</y>
-         <width>80</width>
+         <y>200</y>
+         <width>241</width>
          <height>22</height>
         </rect>
        </property>
        <property name="text">
-        <string>zero</string>
+        <string>Zero</string>
        </property>
       </widget>
       <widget class="QPushButton" name="fs_button">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>290</y>
-         <width>80</width>
+         <y>260</y>
+         <width>111</width>
          <height>22</height>
         </rect>
        </property>
        <property name="text">
-        <string>front_side</string>
+        <string>front_side_up</string>
        </property>
       </widget>
       <widget class="QPushButton" name="fb_button">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>260</y>
-         <width>80</width>
+         <y>230</y>
+         <width>111</width>
          <height>22</height>
         </rect>
        </property>
        <property name="text">
-        <string>front_back</string>
+        <string>front_back_up</string>
        </property>
       </widget>
       <widget class="QPushButton" name="loadVel">
@@ -2185,6 +2185,45 @@ p, li { white-space: pre-wrap; }
         <string>Stop</string>
        </property>
       </widget>
+      <widget class="QPushButton" name="sd_button_down">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>290</y>
+         <width>111</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>side_down_down</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="fs_button_down">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>260</y>
+         <width>111</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>front_side_down</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="fb_button_down">
+       <property name="geometry">
+        <rect>
+         <x>140</x>
+         <y>230</y>
+         <width>111</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>front_back_down</string>
+       </property>
+      </widget>
       <zorder>loadAmp</zorder>
       <zorder>label_41</zorder>
       <zorder>frame_44</zorder>
@@ -2200,6 +2239,9 @@ p, li { white-space: pre-wrap; }
       <zorder>frame_45</zorder>
       <zorder>stop_button</zorder>
       <zorder>Amp</zorder>
+      <zorder>sd_button_down</zorder>
+      <zorder>fs_button_down</zorder>
+      <zorder>fb_button_down</zorder>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_9">

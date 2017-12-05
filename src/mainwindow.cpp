@@ -207,6 +207,10 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(ui->fs_button, SIGNAL(released()), this, SLOT(fs_behavior()));
     QObject::connect(ui->sd_button, SIGNAL(released()), this, SLOT(sd_behavior()));
 
+    QObject::connect(ui->fb_button_down, SIGNAL(released()), this, SLOT(fb_behavior_down()));
+    QObject::connect(ui->fs_button_down, SIGNAL(released()), this, SLOT(fs_behavior_down()));
+    QObject::connect(ui->sd_button_down, SIGNAL(released()), this, SLOT(sd_behavior_down()));
+
     QObject::connect(ui->VelSlider, SIGNAL(valueChanged(int)), this, SLOT(vel_slider()));
     QObject::connect(ui->loadVel, SIGNAL(released()), this, SLOT(loadVel()));
 
@@ -218,6 +222,7 @@ MainWindow::MainWindow(QWidget *parent) :
     stop = 0;
 
     trigger_pub = nh->advertise<roboy_dep::trigger_ref>("/roboy_dep/trigger_ref", 1);
+    tran_dir_pub = nh->advertise<roboy_dep::transition_direction>("/roboy_dep/transition_direction", 1);
 }
 
 MainWindow::~MainWindow()
@@ -300,9 +305,13 @@ void MainWindow::vel_slider(){
 
 void MainWindow::zero_behavior(){
 	roboy_dep::brain_id msg;
-	msg.brain_id = 0;
+	msg.brain_id = 0.;
 	brain_id_pub.publish(msg);
 
+	roboy_dep::transition_direction msg1;
+	msg1.up = true;
+	tran_dir_pub.publish(msg1);
+/*
 	roboy_dep::trigger_ref msg1;
 	double arr[] = {0.0,0.0};
 	vector<double> vec (arr, arr + sizeof(arr) / sizeof(arr[0]) );
@@ -310,6 +319,7 @@ void MainWindow::zero_behavior(){
 	msg1.vel = vec;
 	
 	trigger_pub.publish(msg1);
+*/
 }
 
 void MainWindow::fb_behavior(){
@@ -317,14 +327,9 @@ void MainWindow::fb_behavior(){
 	msg.brain_id = 21.;
 	brain_id_pub.publish(msg);
 
-	roboy_dep::trigger_ref msg1;
-	double arr[] = {0.0,0.0};
-	vector<double> vec (arr, arr + sizeof(arr) / sizeof(arr[0]) );
-	msg1.pos = vec;
-	vec[1] = 1.0;
-	msg1.vel = vec;
-	
-	trigger_pub.publish(msg1);
+	roboy_dep::transition_direction msg1;
+	msg1.up = true;
+	tran_dir_pub.publish(msg1);
 }
 
 void MainWindow::fs_behavior(){
@@ -332,14 +337,9 @@ void MainWindow::fs_behavior(){
 	msg.brain_id = 42.;
 	brain_id_pub.publish(msg);
 
-	roboy_dep::trigger_ref msg1;
-	double arr[] = {0.0,0.0};
-	vector<double> vec (arr, arr + sizeof(arr) / sizeof(arr[0]) );
-	msg1.pos = vec;
-	vec[1] = 1.0;
-	msg1.vel = vec;
-	
-	trigger_pub.publish(msg1);
+	roboy_dep::transition_direction msg1;
+	msg1.up = true;
+	tran_dir_pub.publish(msg1);
 }
 
 void MainWindow::sd_behavior(){
@@ -347,14 +347,39 @@ void MainWindow::sd_behavior(){
 	msg.brain_id = 63.;
 	brain_id_pub.publish(msg);
 
-	roboy_dep::trigger_ref msg1;
-	double arr[] = {0.0,0.0};
-	vector<double> vec (arr, arr + sizeof(arr) / sizeof(arr[0]) );
-	msg1.pos = vec;
-	vec[1] = 1.0;
-	msg1.vel = vec;
-	
-	trigger_pub.publish(msg1);
+	roboy_dep::transition_direction msg1;
+	msg1.up = true;
+	tran_dir_pub.publish(msg1);
+}
+
+void MainWindow::fb_behavior_down(){
+	roboy_dep::brain_id msg;
+	msg.brain_id = 21.;
+	brain_id_pub.publish(msg);
+
+	roboy_dep::transition_direction msg1;
+	msg1.up = false;
+	tran_dir_pub.publish(msg1);
+}
+
+void MainWindow::fs_behavior_down(){
+	roboy_dep::brain_id msg;
+	msg.brain_id = 42.;
+	brain_id_pub.publish(msg);
+
+	roboy_dep::transition_direction msg1;
+	msg1.up = false;
+	tran_dir_pub.publish(msg1);
+}
+
+void MainWindow::sd_behavior_down(){
+	roboy_dep::brain_id msg;
+	msg.brain_id = 63.;
+	brain_id_pub.publish(msg);
+
+	roboy_dep::transition_direction msg1;
+	msg1.up = false;
+	tran_dir_pub.publish(msg1);
 }
 
 void MainWindow::toggleTriggerEdge(){

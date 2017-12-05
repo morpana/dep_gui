@@ -17,6 +17,7 @@
 #include "roboy_dep/stop.h"
 #include "roboy_dep/trigger_ref.h"
 //#include "roboy_dep/transition_start.h"
+#include "roboy_dep/transition_direction.h"
 
 #include <roboy_communication_middleware/MotorConfig.h>
 #include <roboy_communication_middleware/MotorStatus.h>
@@ -56,7 +57,7 @@ public:
 private:
 	Ui::MainWindow *ui;
 	ros::NodeHandlePtr nh;
-	ros::Publisher depCommand, motorConfig, depParameters, depLoadMatrix, transition_pub, linear_combination_pub, brain_id_pub, stop_pub, trigger_pub;//, transition_start_pub;
+	ros::Publisher depCommand, motorConfig, depParameters, depLoadMatrix, transition_pub, linear_combination_pub, brain_id_pub, stop_pub, trigger_pub, tran_dir_pub;//, transition_start_pub;
 	ros::Subscriber depMatrix, motorStatus;
 	boost::shared_ptr<ros::AsyncSpinner> spinner;
 
@@ -119,6 +120,9 @@ private Q_SLOTS:
 	void fb_behavior();
 	void fs_behavior();
 	void sd_behavior();
+	void fb_behavior_down();
+	void fs_behavior_down();
+	void sd_behavior_down();
 	void toggleTriggerEdge();
 	void toggleTrigger();
 	void stepTransition();

@@ -226,6 +226,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(ui->call_script_button, SIGNAL(released()), this, SLOT(call_brain_script()));
     script_pub = nh->advertise<roboy_dep::start_script>("/roboy_dep/start_script", 1);
+
+    target_vel = 50.0;
+    current_vel = 50.0;
+	target_amp = 1.0;
+	current_amp = 1.0;
 }
 
 MainWindow::~MainWindow()
@@ -277,9 +282,14 @@ void MainWindow::stop_toggle(){
 void MainWindow::loadAmp(){
 	// this is a bit of a hack, but...
 	float Amp = atof(ui->Amp->text().toStdString().c_str());
-	ui->amplitude->setText(QString::number(Amp));
+	if (Amp < 0.60){
+		Amp = 0.60;
+	}
+	//ui->amplitude->setText(QString::number(Amp));
 	//ROS_INFO("%i", vel);
-	setDepConfig();
+	target_amp = Amp;
+	ROS_INFO("Target amp: %f", target_amp);
+	//setDepConfig();
 }
 
 void MainWindow::Amp_slider(){
@@ -293,9 +303,17 @@ void MainWindow::Amp_slider(){
 void MainWindow::loadVel(){
 	// this is a bit of a hack, but...
 	int vel = atoi(ui->Vel->text().toStdString().c_str());
-	ui->delay->setText(QString::number(vel));
+	if (vel < 10){
+		vel = 10;
+	}
+	if (vel > 90){
+		vel = 90;
+	}
+	//ui->delay->setText(QString::number(vel));
 	//ROS_INFO("%i", vel);
-	setDepConfig();
+	target_vel = float(vel);
+	ROS_INFO("Target vel: %f", target_vel);
+	//setDepConfig();
 }
 
 void MainWindow::vel_slider(){
@@ -491,6 +509,21 @@ void MainWindow::publishLinearCombination(){
 	while (1){
 		t_start = std::chrono::high_resolution_clock::now();
 
+		if (abs(current_vel - target_vel) > 0.01){
+			float sign = (target_vel-current_vel)/abs(target_vel-current_vel);
+			current_vel += 0.5*sign;
+			ROS_INFO("Current vel: %f", current_vel);
+			ui->delay->setText(QString::number(current_vel));
+			setDepConfig();
+		}
+		
+		if (abs(current_amp - target_amp) > 0.01){
+			float sign = (target_amp-current_amp)/abs(target_amp-current_amp);
+			current_amp += 0.02*sign;
+			ROS_INFO("Current amp: %f, Target amp: %f", current_amp, target_amp);
+			ui->amplitude->setText(QString::number(current_amp));
+			setDepConfig();
+		}
 		if (publish_combination){
 			// publish combination matrix
 			matrix::Matrix temp_matrix;

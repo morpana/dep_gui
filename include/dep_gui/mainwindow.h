@@ -107,6 +107,10 @@ private:
 	bool trigger_on;
 	string prev_filename;
 
+	//parameters for amplitude and velocity control
+	float target_vel, current_vel;
+	float target_amp, current_amp;
+
 	bool stop;
 Q_SIGNALS:
 	void newDepMatrix();

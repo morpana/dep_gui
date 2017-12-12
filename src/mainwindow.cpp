@@ -231,6 +231,11 @@ MainWindow::MainWindow(QWidget *parent) :
     current_vel = 50.0;
 	target_amp = 1.0;
 	current_amp = 1.0;
+
+	vel_rate = 0.5;
+	amp_rate = 0.02;
+	QObject::connect(ui->loadAmpRate, SIGNAL(released()), this, SLOT(loadAmpRate()));
+	QObject::connect(ui->loadVelRate, SIGNAL(released()), this, SLOT(loadVelRate()));
 }
 
 MainWindow::~MainWindow()
@@ -259,6 +264,16 @@ void MainWindow::plotDepMatrix_2(){
 	}
 	ui->customPlot->replot();
 }*/
+
+void  MainWindow::loadVelRate(){
+	vel_rate = atof(ui->vel_rate->text().toStdString().c_str());
+	ROS_INFO("Vel. rate: %f", vel_rate);
+}
+
+void  MainWindow::loadAmpRate(){
+	amp_rate = atof(ui->amp_rate->text().toStdString().c_str());
+	ROS_INFO("Amp. rate: %f", amp_rate);
+}
 
 void MainWindow::call_brain_script(){
 	roboy_dep::start_script msg;
@@ -510,20 +525,31 @@ void MainWindow::publishLinearCombination(){
 		t_start = std::chrono::high_resolution_clock::now();
 
 		if (abs(current_vel - target_vel) > 0.01){
-			float sign = (target_vel-current_vel)/abs(target_vel-current_vel);
-			current_vel += 0.5*sign;
+			float diff = target_vel-current_vel;
+			float sign = (diff)/abs(diff);
+			if (abs(diff) < vel_rate){
+				current_vel = target_vel;
+			} else {
+				current_vel += vel_rate*sign;
+			}
 			ROS_INFO("Current vel: %f", current_vel);
 			ui->delay->setText(QString::number(current_vel));
 			setDepConfig();
 		}
 		
 		if (abs(current_amp - target_amp) > 0.01){
-			float sign = (target_amp-current_amp)/abs(target_amp-current_amp);
-			current_amp += 0.02*sign;
+			float diff = target_amp-current_amp;
+			float sign = (diff)/abs(diff);
+			if (abs(diff) < amp_rate){
+				current_amp = target_amp;
+			} else {
+				current_amp += amp_rate*sign;
+			}
 			ROS_INFO("Current amp: %f, Target amp: %f", current_amp, target_amp);
 			ui->amplitude->setText(QString::number(current_amp));
 			setDepConfig();
 		}
+
 		if (publish_combination){
 			// publish combination matrix
 			matrix::Matrix temp_matrix;

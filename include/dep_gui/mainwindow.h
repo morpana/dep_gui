@@ -111,11 +111,15 @@ private:
 	float target_vel, current_vel;
 	float target_amp, current_amp;
 
+	float vel_rate, amp_rate;
+
 	bool stop;
 Q_SIGNALS:
 	void newDepMatrix();
 	void newMotorData();
 private Q_SLOTS:
+	void loadVelRate();
+	void loadAmpRate();
 	void call_brain_script();
 	void vel_slider();
 	void loadVel();

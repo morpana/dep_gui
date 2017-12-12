@@ -1390,13 +1390,6 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;6. Select and observe the behavior of the DEP network and of the arm in the &amp;quot;DEP Matrix&amp;quot; tab&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
-     <zorder>frame_31</zorder>
-     <zorder>frame_32</zorder>
-     <zorder>frame_33</zorder>
-     <zorder>label_31</zorder>
-     <zorder>label_38</zorder>
-     <zorder>textBrowser</zorder>
-     <zorder>textBrowser_2</zorder>
     </widget>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -2069,7 +2062,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>290</y>
+         <y>360</y>
          <width>111</width>
          <height>22</height>
         </rect>
@@ -2082,7 +2075,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>200</y>
+         <y>270</y>
          <width>241</width>
          <height>22</height>
         </rect>
@@ -2095,7 +2088,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>260</y>
+         <y>330</y>
          <width>111</width>
          <height>22</height>
         </rect>
@@ -2108,7 +2101,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>230</y>
+         <y>300</y>
          <width>111</width>
          <height>22</height>
         </rect>
@@ -2171,12 +2164,15 @@ p, li { white-space: pre-wrap; }
          <string>50</string>
         </property>
        </widget>
+       <zorder>VelSlider</zorder>
+       <zorder>Vel</zorder>
+       <zorder>loadVel</zorder>
       </widget>
       <widget class="QPushButton" name="stop_button">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>170</y>
+         <y>240</y>
          <width>241</width>
          <height>22</height>
         </rect>
@@ -2189,7 +2185,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>290</y>
+         <y>360</y>
          <width>111</width>
          <height>22</height>
         </rect>
@@ -2202,7 +2198,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>260</y>
+         <y>330</y>
          <width>111</width>
          <height>22</height>
         </rect>
@@ -2215,7 +2211,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>230</y>
+         <y>300</y>
          <width>111</width>
          <height>22</height>
         </rect>
@@ -2237,25 +2233,58 @@ p, li { white-space: pre-wrap; }
         <string>call script</string>
        </property>
       </widget>
-      <zorder>loadAmp</zorder>
-      <zorder>label_41</zorder>
-      <zorder>frame_44</zorder>
-      <zorder>sd_button</zorder>
-      <zorder>zero_button</zorder>
-      <zorder>fs_button</zorder>
-      <zorder>fb_button</zorder>
-      <zorder>sd_button</zorder>
-      <zorder>zero_button</zorder>
-      <zorder>fs_button</zorder>
-      <zorder>fb_button</zorder>
-      <zorder>loadVel</zorder>
-      <zorder>frame_45</zorder>
-      <zorder>stop_button</zorder>
-      <zorder>Amp</zorder>
-      <zorder>sd_button_down</zorder>
-      <zorder>fs_button_down</zorder>
-      <zorder>fb_button_down</zorder>
-      <zorder>call_script_button</zorder>
+      <widget class="QLineEdit" name="amp_rate">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>180</y>
+         <width>121</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0.02</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="loadAmpRate">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>180</y>
+         <width>121</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Amplitude rate</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="vel_rate">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>200</y>
+         <width>121</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0.5</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="loadVelRate">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>200</y>
+         <width>121</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Velocity rate</string>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_9">
